@@ -16,4 +16,12 @@ function TyconnService.AssignTycoon(player)
 	return nil
 end
 
+function TyconnService.GetTycoon(player)
+	for _, tycoon in Tycoons:GetChildren() do
+		if tycoon:GetAttribute("Player") == player.UserId then
+			return tycoon
+		end
+	end
+end
+
 return TyconnService
