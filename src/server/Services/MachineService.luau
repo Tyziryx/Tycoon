@@ -1,9 +1,8 @@
-local MachineService = {}
+-- local MachineService = {}
 
-local CollectionService = game:GetService("CollectionService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+-- local CollectionService = game:GetService("CollectionService")
+-- local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
+-- local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
 
-local function getMachine(machineId)
-    
+-- local function getMachine(machineId)

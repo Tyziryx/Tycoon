@@ -6,6 +6,7 @@ local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
 local MoneyService = require(script.Parent.MoneyService)
 local DefaultPlayerData = require(script.Parent.Parent.Data.PlayerData)
 local ButtonService = require(script.Parent.ButtonService)
+local TyconnService = require(script.Parent.TyconnService)
 
 local PlayerService = {}
 
@@ -61,6 +62,7 @@ function PlayerService.OnPlayerAdded(player)
 	end
 
 	MoneyService.SetupLeaderstats(player)
+	TyconnService.AssignTycoon(player)
 end
 
 function PlayerService.Init()
