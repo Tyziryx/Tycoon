@@ -5,8 +5,7 @@ local CollectionService = game:GetService("CollectionService")
 local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
 local MoneyService = require(script.Parent.MoneyService)
 local DefaultPlayerData = require(script.Parent.Parent.Data.PlayerData)
-local ButtonService = require(script.Parent.ButtonService)
-local TyconnService = require(script.Parent.TyconnService)
+local TyconnService = require(script.Parent.TycoonService)
 
 local PlayerService = {}
 

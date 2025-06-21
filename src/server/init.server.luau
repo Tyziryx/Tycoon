@@ -10,8 +10,12 @@ local ZoneConfig = require(ReplicatedStorage.Shared.Config.ZoneConfig)
 local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
 local PlayerService = require(script.Services.PlayerService)
 local ButtonService = require(script.Services.ButtonService)
+local TycoonService = require(script.Services.TycoonService)
+local MachineService = require(script.Services.MachineService)
 
 PlayerService.Init()
+TycoonService.Init()
+wait(2)
 ButtonService.Init()
 
 print("Serveur initialisé avec succès!")
