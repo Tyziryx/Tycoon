@@ -1,5 +1,5 @@
 local DefaultPlayerData = {
-	Money = 100,
+	Money = 0,
 	UnlockedZones = { 1 },
 	OwnedMachines = {},
 	Stats = {
