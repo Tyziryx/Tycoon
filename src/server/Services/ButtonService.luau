@@ -5,31 +5,14 @@ local buttonModel = Workspace.Template.Button
 
 local ButtonService = {}
 
-function ButtonService.Init() end
-
--- function ButtonService.CreateButton(player, position, cost)
--- 	local button = buttonModel:Clone()
--- 	button.Parent = Workspace.World
--- 	button.Position = position
--- 	button.Transparency = 0
--- 	button.CanCollide = false
--- 	button.Anchored = true
-
--- 	button:SetAttribute("Cost", cost)
--- 	button:SetAttribute("Player", player.UserId)
-
--- 	button.Touched:Connect(function(hit)
--- 		local player = game.Players:GetPlayerFromCharacter(hit.Parent)
--- 		if player then
--- 			print(player.Name .. " a touché le bouton rouge!")
--- 		end
--- 	end)
-
--- 	local BillBoardGui = button:FindFirstChild("Cost")
--- 	local Label = BillBoardGui:FindFirstChild("Label")
--- 	Label.Text = cost .. " $"
--- 	BillBoardGui.Enabled = true
--- end
+function ButtonService.Init() 
+	for  _, Button in CollectionService:GetTagged("TycoonButton") do
+		if Button:IsA("BasePart") then
+			Button.Transparency = 0
+			Button.CanCollide = false
+			Button.Anchored = true
+		end
+	end
 
 function ButtonService.UpdateButton()
 	for _, button in CollectionService:GetTagged("TycoonButton") do
