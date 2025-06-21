@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
 
 local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
 local MoneyService = require(script.Parent.MoneyService)
@@ -60,9 +61,6 @@ function PlayerService.OnPlayerAdded(player)
 	end
 
 	MoneyService.SetupLeaderstats(player)
-
-	ButtonService.CreateButton(player, Vector3.new(0, 8, 0), 100)
-	ButtonService.CreateButton(player, Vector3.new(6, 8, 0), 200)
 end
 
 function PlayerService.Init()
