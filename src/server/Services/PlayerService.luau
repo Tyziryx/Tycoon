@@ -54,10 +54,10 @@ function PlayerService.OnPlayerAdded(player)
 		end
 	end
 
-	local moneyValue = dataFolder:FindFirstChild("Pollution")
+	local moneyValue = dataFolder:FindFirstChild("Money")
 	if moneyValue then
 		moneyValue.Value = GameConfig.STARTING_MONEY
-		print("Pollution set to " .. GameConfig.STARTING_MONEY)
+		print("Money set to " .. GameConfig.STARTING_MONEY)
 	end
 
 	MoneyService.SetupLeaderstats(player)
