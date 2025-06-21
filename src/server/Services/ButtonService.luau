@@ -39,18 +39,17 @@ end
 
 function ButtonService.UpdateButton()
 	for _, button in CollectionService:GetTagged("TycoonButton") do
-		local cost = tonumber(button:GetAttribute("Cost"))
-		print(button.Parent.Parent:GetAttribute("UserId"))
+		if not button:IsDescendantOf(Workspace.Tycoons) then
+			continue
+		end
+		local cost = tonumber(MachineService.GetMachine(button:GetAttribute("machineId")):GetAttribute("Cost"))
 		local playerId = button.Parent.Parent:GetAttribute("UserId")
-		print("Button: ", button.Name, " Cost: ", cost, " PlayerId: ", playerId, "Parent ", button.Parent.Parent)
 
-		if playerId == nil and playerId.IsA(string) then
+		if playerId == nil or type(playerId) ~= "number" then
 			return
 		end
 		local player = game.Players:GetPlayerByUserId(playerId)
-		print("Player: ", player and player.Name or "nil")
 		if cost and player then
-			print(cost, player.leaderstats.Money.Value)
 			if MoneyService.CanAfford(player, cost) then
 				button.Color = Color3.fromRGB(42, 221, 42)
 			else

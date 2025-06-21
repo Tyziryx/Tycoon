@@ -21,7 +21,7 @@ ButtonService.Init()
 print("Serveur initialisé avec succès!")
 
 while true do
-	ButtonService.UpdateButton()
 	PlayerService.UpdatePlayer()
-	task.wait(2)
+	ButtonService.UpdateButton()
+	task.wait(1)
 end
