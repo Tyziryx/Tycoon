@@ -17,7 +17,6 @@ function ButtonService.init()
 
 	for _, Button in CollectionService:GetTagged("TycoonButton") do
 		local machineId = Button:GetAttribute("machineId")
-		local Machine = MachineService.getMachine(machineId)
 		local Cost = MachineConfig[machineId].BaseCost
 		local MachineName = MachineConfig[machineId].Name
 
