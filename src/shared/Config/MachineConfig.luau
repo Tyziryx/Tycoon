@@ -32,7 +32,7 @@ local MachineConfig = {
 		ButtonRequired = 2,
 		BaseCost = 60,
 		BaseIncome = 1,
-		ZoneRequired = 2,
+		ZoneRequired = 1,
 		MaxLevel = 3,
 		UpgradeCost = function(level)
 			return 100 * level
