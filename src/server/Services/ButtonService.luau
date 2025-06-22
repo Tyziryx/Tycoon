@@ -45,7 +45,13 @@ function ButtonService.Init()
 			Button.Transparency = 1
 			Button.Cost.Enabled = false
 			Button:SetAttribute("Unlocked", true)
+			ButtonService.RequireButton(Button, player)
 		end)
+		if machineId == 1 then
+			ButtonService.ButtonShow(Button)
+		else
+			ButtonService.HideButton(Button)
+		end
 	end
 end
 
@@ -61,6 +67,7 @@ function ButtonService.UpdateButton()
 		if playerId == nil or type(playerId) ~= "number" then
 			return
 		end
+
 		local player = game.Players:GetPlayerByUserId(playerId)
 		if cost and player then
 			if MoneyService.CanAfford(player, cost) then
@@ -68,6 +75,47 @@ function ButtonService.UpdateButton()
 			else
 				button.Color = Color3.fromRGB(196, 40, 28)
 			end
+		end
+	end
+end
+
+function ButtonService.HideButton(button)
+	if button:IsA("BasePart") then
+		button.Transparency = 1
+		button.Cost.Enabled = false
+		if button:FindFirstChild("ClickDetector") then
+			button.ClickDetector.MaxActivationDistance = 0
+		end
+	end
+end
+
+function ButtonService.ButtonShow(button)
+	if button:IsA("BasePart") then
+		button.Transparency = 0
+		button.Cost.Enabled = true
+		if button:FindFirstChild("ClickDetector") then
+			button.ClickDetector.MaxActivationDistance = 32
+		end
+	end
+end
+function ButtonService.GetButton(machineId)
+	for _, button in CollectionService:GetTagged("TycoonButton") do
+		if button:GetAttribute("machineId") == machineId then
+			return button
+		end
+	end
+	return nil
+end
+
+function ButtonService.RequireButton(parentButton, player)
+	local machineId = parentButton:GetAttribute("machineId")
+	local requiredButtonId = MachineConfig[machineId].NextButton
+	local childButton = ButtonService.GetButton(requiredButtonId)
+	if childButton then
+		if parentButton:GetAttribute("Unlocked") then
+			ButtonService.ButtonShow(childButton)
+		else
+			ButtonService.HideButton(childButton)
 		end
 	end
 end
