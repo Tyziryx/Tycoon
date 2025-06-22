@@ -1,5 +1,7 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
+
 local Workspace = game:GetService("Workspace")
 local TycoonService = require(script.Parent.TycoonService)
 local MachineService = require(script.Parent.MachineService)
@@ -8,9 +10,10 @@ local ButtonService = {}
 
 function ButtonService.Init()
 	for _, Button in CollectionService:GetTagged("TycoonButton") do
-		local Machine = MachineService.GetMachine(Button:GetAttribute("machineId"))
-		local Cost = Machine:GetAttribute("Cost")
-		local MachineName = Machine.Name
+		local machineId = Button:GetAttribute("machineId")
+		local Machine = MachineService.GetMachine(machineId)
+		local Cost = MachineConfig[machineId].BaseCost
+		local MachineName = MachineConfig[machineId].Name
 
 		Button.Cost:GetChildren()[1].Text = MachineName .. " " .. Cost .. " $"
 
@@ -34,7 +37,7 @@ function ButtonService.Init()
 				return
 			end
 
-			local success = MachineService.UnlockMachine(player, Button:GetAttribute("machineId"))
+			local success = MachineService.UnlockMachine(player, machineId)
 
 			if not success then
 				return
@@ -51,7 +54,8 @@ function ButtonService.UpdateButton()
 		if not button:IsDescendantOf(Workspace.Tycoons) then
 			continue
 		end
-		local cost = tonumber(MachineService.GetMachine(button:GetAttribute("machineId")):GetAttribute("Cost"))
+		local machineId = button:GetAttribute("machineId")
+		local cost = MachineConfig[machineId].BaseCost
 		local playerId = button.Parent.Parent:GetAttribute("UserId")
 
 		if playerId == nil or type(playerId) ~= "number" then

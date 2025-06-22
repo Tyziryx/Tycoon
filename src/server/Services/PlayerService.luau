@@ -3,6 +3,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 
 local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
+local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
+
 local MoneyService = require(script.Parent.MoneyService)
 local DefaultPlayerData = require(script.Parent.Parent.Data.PlayerData)
 local TyconnService = require(script.Parent.TycoonService)
@@ -69,7 +71,15 @@ end
 
 function PlayerService.UpdatePlayer()
 	for _, player in Players:GetPlayers() do
-		MoneyService.AddMoney(player, 10)
+		local totalIncome = 0
+		local ownedMachines = player.Data.OwnedMachines
+		for _, machine in ownedMachines:GetChildren() do
+			local machineId = machine.Value
+			local machineConfig = MachineConfig[machineId]
+			local income = machineConfig.BaseIncome
+			totalIncome = totalIncome + income
+		end
+		MoneyService.AddMoney(player, totalIncome)
 	end
 end
 
