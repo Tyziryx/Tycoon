@@ -11,7 +11,7 @@ local TyconnService = require(script.Parent.TycoonService)
 
 local PlayerService = {}
 
-function PlayerService.OnPlayerAdded(player)
+function PlayerService.onPlayerAdded(player)
 	if player == nil then
 		warn("Player is nil")
 		return
@@ -65,16 +65,16 @@ function PlayerService.OnPlayerAdded(player)
 		moneyValue.Value = GameConfig.STARTING_MONEY
 	end
 
-	MoneyService.SetupLeaderstats(player)
-	PollutionService.SetupLeaderstats(player)
-	TyconnService.AssignTycoon(player)
+	MoneyService.setupLeaderstats(player)
+	PollutionService.setupLeaderstats(player)
+	TyconnService.assignTycoon(player)
 end
 
-function PlayerService.Init()
-	Players.PlayerAdded:Connect(PlayerService.OnPlayerAdded)
+function PlayerService.init()
+	Players.PlayerAdded:Connect(PlayerService.onPlayerAdded)
 end
 
-function PlayerService.UpdatePlayer()
+function PlayerService.updatePlayer()
 	for _, player in Players:GetPlayers() do
 		if player == nil then
 			warn("Player is nil")
@@ -88,7 +88,7 @@ function PlayerService.UpdatePlayer()
 			local income = machineConfig.BaseIncome
 			totalIncome = totalIncome + income
 		end
-		PollutionService.AddPollution(player, totalIncome)
+		PollutionService.addPollution(player, totalIncome)
 	end
 end
 

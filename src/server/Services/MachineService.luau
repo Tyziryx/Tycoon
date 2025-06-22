@@ -1,17 +1,14 @@
 local MachineService = {}
 
-local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
-local ZoneConfig = require(ReplicatedStorage.Shared.Config.ZoneConfig)
 local TycoonService = require(script.Parent.TycoonService)
 local MoneyService = require(script.Parent.MoneyService)
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Machines = ReplicatedStorage:WaitForChild("Machines")
 
 -- local function getMachine(machineId)
-function MachineService.GetMachine(machineId)
+function MachineService.getMachine(machineId)
 	if machineId == nil then
 		warn("MachineId is nil")
 		return nil
@@ -23,27 +20,26 @@ function MachineService.GetMachine(machineId)
 	end
 	return nil
 end
-function MachineService.UnlockMachine(player, machineId)
-	local tycoon = TycoonService.GetTycoon(player)
+function MachineService.unlockMachine(player, machineId)
+	local tycoon = TycoonService.getTycoon(player)
 	if not tycoon or machineId == nil or player == nil then
 		return
 	end
 	local machineConfig = MachineConfig[machineId]
 	local UnlockedZones = player.Data.UnlockedZones
 	local zoneId = machineConfig.ZoneRequired
-	local zoneConfig = ZoneConfig[zoneId]
 	if not UnlockedZones:GetChildren()[zoneId] then
 		return false
 	end
-	local Machine = MachineService.GetMachine(machineId):Clone()
+	local Machine = MachineService.getMachine(machineId):Clone()
 	local Cost = machineConfig.BaseCost
 
-	if not MoneyService.CanAfford(player, Cost) then
+	if not MoneyService.canAfford(player, Cost) then
 		return false
 	end
-	MoneyService.RemoveMoney(player, Cost) -- Deduct the cost from the player's money
+	MoneyService.removeMoney(player, Cost) -- Deduct the cost from the player's money
 
-	local RelativeCF = TycoonService.GetRelativeCFrame(machineId) -- Get the relative CFrame for the machine
+	local RelativeCF = TycoonService.getRelativeCFrame(machineId) -- Get the relative CFrame for the machine
 
 	local WorldCF = tycoon.PrimaryPart.CFrame:toWorldSpace(RelativeCF)
 

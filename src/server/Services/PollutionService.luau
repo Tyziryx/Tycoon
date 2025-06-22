@@ -1,6 +1,6 @@
 local PollutionService = {}
 
-function PollutionService.SetupLeaderstats(player)
+function PollutionService.setupLeaderstats(player)
 	if player == nil then
 		warn("Player is nil")
 		return
@@ -26,7 +26,7 @@ function PollutionService.SetupLeaderstats(player)
 	return pollution
 end
 
-function PollutionService.AddPollution(player, amount)
+function PollutionService.addPollution(player, amount)
 	if player == nil then
 		warn("Player is nil")
 		return
@@ -42,7 +42,7 @@ function PollutionService.AddPollution(player, amount)
 	end
 end
 
-function PollutionService.RemovePollution(player, amount)
+function PollutionService.removePollution(player, amount)
 	if player == nil then
 		warn("Player is nil")
 		return
@@ -59,7 +59,7 @@ function PollutionService.RemovePollution(player, amount)
 	return false
 end
 
-function PollutionService.GetPollution(player)
+function PollutionService.getPollution(player)
 	if player == nil then
 		warn("Player is nil")
 		return
@@ -71,7 +71,7 @@ function PollutionService.GetPollution(player)
 	return 0
 end
 
-function PollutionService.CanAfford(player, cost)
+function PollutionService.canAfford(player, cost)
 	if player == nil then
 		warn("Player is nil")
 		return

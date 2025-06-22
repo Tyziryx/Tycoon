@@ -8,10 +8,16 @@ local MachineService = require(script.Parent.MachineService)
 local MoneyService = require(script.Parent.MoneyService)
 local ButtonService = {}
 
-function ButtonService.Init()
+function ButtonService.init()
+	-- Écouter l'événement pour mettre à jour les boutons immédiatement
+	local updateButtonsEvent = ReplicatedStorage:WaitForChild("UpdateButtons")
+	updateButtonsEvent.Event:Connect(function()
+		ButtonService.updateButton()
+	end)
+
 	for _, Button in CollectionService:GetTagged("TycoonButton") do
 		local machineId = Button:GetAttribute("machineId")
-		local Machine = MachineService.GetMachine(machineId)
+		local Machine = MachineService.getMachine(machineId)
 		local Cost = MachineConfig[machineId].BaseCost
 		local MachineName = MachineConfig[machineId].Name
 
@@ -28,7 +34,7 @@ function ButtonService.Init()
 				return
 			end
 
-			local tycoon = TycoonService.GetTycoon(player)
+			local tycoon = TycoonService.getTycoon(player)
 
 			if not tycoon then
 				return
@@ -37,24 +43,24 @@ function ButtonService.Init()
 				return
 			end
 
-			local success = MachineService.UnlockMachine(player, machineId)
+			local success = MachineService.unlockMachine(player, machineId)
 			if not success then
 				return
 			end
 
-			ButtonService.HideButton(Button)
+			ButtonService.hideButton(Button)
 			Button:SetAttribute("Unlocked", true)
-			ButtonService.RequireButton(Button, player)
+			ButtonService.requireButton(Button, player)
 		end)
 		if machineId == 1 then
-			ButtonService.ButtonShow(Button)
+			ButtonService.buttonShow(Button)
 		else
-			ButtonService.HideButton(Button)
+			ButtonService.hideButton(Button)
 		end
 	end
 end
 
-function ButtonService.UpdateButton()
+function ButtonService.updateButton()
 	for _, button in CollectionService:GetTagged("TycoonButton") do
 		if not button:IsDescendantOf(Workspace.Tycoons) then
 			continue
@@ -69,7 +75,7 @@ function ButtonService.UpdateButton()
 
 		local player = game.Players:GetPlayerByUserId(playerId)
 		if cost and player then
-			if MoneyService.CanAfford(player, cost) then
+			if MoneyService.canAfford(player, cost) then
 				button.Color = Color3.fromRGB(42, 221, 42)
 			else
 				button.Color = Color3.fromRGB(196, 40, 28)
@@ -78,7 +84,7 @@ function ButtonService.UpdateButton()
 	end
 end
 
-function ButtonService.HideButton(button)
+function ButtonService.hideButton(button)
 	if button == nil then
 		warn("Button is nil")
 		return
@@ -95,7 +101,7 @@ function ButtonService.HideButton(button)
 	end
 end
 
-function ButtonService.ButtonShow(button)
+function ButtonService.buttonShow(button)
 	if button == nil then
 		warn("Button is nil")
 		return
@@ -111,7 +117,7 @@ function ButtonService.ButtonShow(button)
 		end
 	end
 end
-function ButtonService.GetButton(machineId)
+function ButtonService.getButton(machineId)
 	for _, button in CollectionService:GetTagged("TycoonButton") do
 		if button:GetAttribute("machineId") == machineId then
 			return button
@@ -120,7 +126,7 @@ function ButtonService.GetButton(machineId)
 	return nil
 end
 
-function ButtonService.RequireButton(parentButton, player)
+function ButtonService.requireButton(parentButton, player)
 	if parentButton == nil then
 		warn("ParentButton is nil")
 		return
@@ -131,12 +137,12 @@ function ButtonService.RequireButton(parentButton, player)
 	end
 	local machineId = parentButton:GetAttribute("machineId")
 	local requiredButtonId = MachineConfig[machineId].NextButton
-	local childButton = ButtonService.GetButton(requiredButtonId)
+	local childButton = ButtonService.getButton(requiredButtonId)
 	if childButton then
 		if parentButton:GetAttribute("Unlocked") then
-			ButtonService.ButtonShow(childButton)
+			ButtonService.buttonShow(childButton)
 		else
-			ButtonService.HideButton(childButton)
+			ButtonService.hideButton(childButton)
 		end
 	end
 end

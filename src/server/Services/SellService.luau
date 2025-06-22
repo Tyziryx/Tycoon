@@ -1,8 +1,15 @@
 local MoneyService = require(script.Parent.MoneyService)
 local PollutionService = require(script.Parent.PollutionService)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local SellService = {}
 
-function SellService.Init(tycoon)
+-- Créer un événement pour notifier les mises à jour
+local updateButtonsEvent = Instance.new("BindableEvent")
+updateButtonsEvent.Name = "UpdateButtons"
+updateButtonsEvent.Parent = ReplicatedStorage
+
+function SellService.init(tycoon)
 	if tycoon == nil then
 		warn("Player is nil")
 		return
@@ -37,13 +44,14 @@ function SellService.Init(tycoon)
 			warn("Player is nil")
 			return
 		end
-		local pollution = PollutionService.GetPollution(player)
+		local pollution = PollutionService.getPollution(player)
 		if pollution == nil then
 			warn("Pollution is nil")
 			return
 		end
-		PollutionService.RemovePollution(player, pollution)
-		MoneyService.AddMoney(player, pollution)
+		PollutionService.removePollution(player, pollution)
+		MoneyService.addMoney(player, pollution)
+		updateButtonsEvent:Fire()
 	end)
 end
 

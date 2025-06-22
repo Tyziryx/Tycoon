@@ -5,7 +5,7 @@ local PlaceholderTycoon = ReplicatedStorage:WaitForChild("Tycoon")
 local CollectionService = game:GetService("CollectionService")
 local SellService = require(script.Parent.SellService)
 
-function TycoonService.Init()
+function TycoonService.init()
 	for _, Tycoon in CollectionService:GetTagged("Tycoon") do
 		if Tycoon:IsDescendantOf(ReplicatedStorage) then
 			continue
@@ -14,7 +14,7 @@ function TycoonService.Init()
 	end
 end
 
-function TycoonService.AssignTycoon(player)
+function TycoonService.assignTycoon(player)
 	if player == nil then
 		warn("Player is nil")
 		return nil
@@ -26,13 +26,13 @@ function TycoonService.AssignTycoon(player)
 		tycoon:SetAttribute("Taken", true)
 		tycoon:SetAttribute("UserId", player.UserId)
 
-		SellService.Init(tycoon)
+		SellService.init(tycoon)
 		return tycoon
 	end
 	return nil
 end
 
-function TycoonService.GetTycoon(player)
+function TycoonService.getTycoon(player)
 	if player == nil then
 		warn("Player is nil")
 		return nil
@@ -45,7 +45,7 @@ function TycoonService.GetTycoon(player)
 	return nil
 end
 
-function TycoonService.GetMachineInTycoonById(machineId)
+function TycoonService.getMachineInTycoonById(machineId)
 	if machineId == nil then
 		warn("MachineId is nil")
 		return nil
@@ -59,12 +59,12 @@ function TycoonService.GetMachineInTycoonById(machineId)
 	return nil
 end
 
-function TycoonService.GetRelativeCFrame(machineId)
+function TycoonService.getRelativeCFrame(machineId)
 	if machineId == nil then
 		warn("MachineId is nil")
 		return nil
 	end
-	local Machines = TycoonService.GetMachineInTycoonById(machineId)
+	local Machines = TycoonService.getMachineInTycoonById(machineId)
 
 	local RelativeCF = PlaceholderTycoon.PrimaryPart.CFrame:toObjectSpace(Machines:GetPivot())
 	return RelativeCF

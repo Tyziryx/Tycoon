@@ -13,15 +13,15 @@ local ButtonService = require(script.Services.ButtonService)
 local TycoonService = require(script.Services.TycoonService)
 local MachineService = require(script.Services.MachineService)
 
-PlayerService.Init()
-TycoonService.Init()
+PlayerService.init()
+TycoonService.init()
 wait(2)
-ButtonService.Init()
+ButtonService.init()
 
 print("Serveur initialisé avec succès!")
 
 while true do
-	PlayerService.UpdatePlayer()
-	ButtonService.UpdateButton()
+	PlayerService.updatePlayer()
+	ButtonService.updateButton()
 	task.wait(GameConfig.GENERATION_INTERVAL)
 end

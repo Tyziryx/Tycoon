@@ -1,6 +1,6 @@
 local MoneyService = {}
 
-function MoneyService.SetupLeaderstats(player)
+function MoneyService.setupLeaderstats(player)
 	if player == nil then
 		warn("Player is nil")
 		return
@@ -27,7 +27,7 @@ function MoneyService.SetupLeaderstats(player)
 	return money
 end
 
-function MoneyService.AddMoney(player, amount)
+function MoneyService.addMoney(player, amount)
 	if player == nil then
 		warn("Player is nil")
 		return
@@ -42,7 +42,7 @@ function MoneyService.AddMoney(player, amount)
 	end
 end
 
-function MoneyService.RemoveMoney(player, amount)
+function MoneyService.removeMoney(player, amount)
 	if player == nil then
 		warn("Player is nil")
 		return
@@ -59,7 +59,7 @@ function MoneyService.RemoveMoney(player, amount)
 	return false
 end
 
-function MoneyService.GetMoney(player)
+function MoneyService.getMoney(player)
 	if player == nil then
 		warn("Player is nil")
 		return
@@ -71,7 +71,7 @@ function MoneyService.GetMoney(player)
 	return 0
 end
 
-function MoneyService.CanAfford(player, cost)
+function MoneyService.canAfford(player, cost)
 	if player == nil then
 		warn("Player is nil")
 		return
