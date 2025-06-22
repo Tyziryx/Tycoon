@@ -5,9 +5,13 @@ function MoneyService.SetupLeaderstats(player)
 		warn("Player is nil")
 		return
 	end
-	local leaderstats = Instance.new("Folder")
-	leaderstats.Name = "leaderstats"
-	leaderstats.Parent = player
+
+	local leaderstats = player:FindFirstChild("leaderstats")
+	if not leaderstats then
+		leaderstats = Instance.new("Folder")
+		leaderstats.Name = "leaderstats"
+		leaderstats.Parent = player
+	end
 
 	local money = Instance.new("IntValue")
 	money.Name = "Money"

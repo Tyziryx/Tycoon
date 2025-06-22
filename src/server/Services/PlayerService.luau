@@ -1,11 +1,11 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CollectionService = game:GetService("CollectionService")
 
 local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
 local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
 
 local MoneyService = require(script.Parent.MoneyService)
+local PollutionService = require(script.Parent.PollutionService)
 local DefaultPlayerData = require(script.Parent.Parent.Data.PlayerData)
 local TyconnService = require(script.Parent.TycoonService)
 
@@ -66,6 +66,7 @@ function PlayerService.OnPlayerAdded(player)
 	end
 
 	MoneyService.SetupLeaderstats(player)
+	PollutionService.SetupLeaderstats(player)
 	TyconnService.AssignTycoon(player)
 end
 
@@ -87,7 +88,7 @@ function PlayerService.UpdatePlayer()
 			local income = machineConfig.BaseIncome
 			totalIncome = totalIncome + income
 		end
-		MoneyService.AddMoney(player, totalIncome)
+		PollutionService.AddPollution(player, totalIncome)
 	end
 end
 

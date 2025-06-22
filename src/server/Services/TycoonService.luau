@@ -3,6 +3,8 @@ local TycoonService = {}
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlaceholderTycoon = ReplicatedStorage:WaitForChild("Tycoon")
 local CollectionService = game:GetService("CollectionService")
+local SellService = require(script.Parent.SellService)
+
 function TycoonService.Init()
 	for _, Tycoon in CollectionService:GetTagged("Tycoon") do
 		if Tycoon:IsDescendantOf(ReplicatedStorage) then
@@ -23,6 +25,8 @@ function TycoonService.AssignTycoon(player)
 		end
 		tycoon:SetAttribute("Taken", true)
 		tycoon:SetAttribute("UserId", player.UserId)
+
+		SellService.Init(tycoon)
 		return tycoon
 	end
 	return nil
@@ -38,6 +42,7 @@ function TycoonService.GetTycoon(player)
 			return tycoon
 		end
 	end
+	return nil
 end
 
 function TycoonService.GetMachineInTycoonById(machineId)
@@ -50,6 +55,8 @@ function TycoonService.GetMachineInTycoonById(machineId)
 			return Machine
 		end
 	end
+	warn("Machine not found")
+	return nil
 end
 
 function TycoonService.GetRelativeCFrame(machineId)
