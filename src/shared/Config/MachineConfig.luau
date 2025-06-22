@@ -29,7 +29,7 @@ local MachineConfig = {
 		Name = "CampFire",
 		BaseCost = 300,
 		BaseIncome = 30,
-		ZoneRequired = 2,
+		ZoneRequired = 1,
 		MaxLevel = 3,
 		UpgradeCost = function(level)
 			return 100 * level
