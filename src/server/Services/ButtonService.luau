@@ -38,7 +38,6 @@ function ButtonService.Init()
 			end
 
 			local success = MachineService.UnlockMachine(player, machineId)
-
 			if not success then
 				return
 			end
