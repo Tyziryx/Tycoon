@@ -1,6 +1,10 @@
 local MoneyService = {}
 
 function MoneyService.SetupLeaderstats(player)
+	if player == nil then
+		warn("Player is nil")
+		return
+	end
 	local leaderstats = Instance.new("Folder")
 	leaderstats.Name = "leaderstats"
 	leaderstats.Parent = player
@@ -20,6 +24,10 @@ function MoneyService.SetupLeaderstats(player)
 end
 
 function MoneyService.AddMoney(player, amount)
+	if player == nil then
+		warn("Player is nil")
+		return
+	end
 	local moneyValue = player.Data:FindFirstChild("Money")
 	if moneyValue then
 		moneyValue.Value = moneyValue.Value + amount
@@ -31,6 +39,10 @@ function MoneyService.AddMoney(player, amount)
 end
 
 function MoneyService.RemoveMoney(player, amount)
+	if player == nil then
+		warn("Player is nil")
+		return
+	end
 	local moneyValue = player.Data:FindFirstChild("Money")
 	if moneyValue and moneyValue.Value >= amount then
 		moneyValue.Value = moneyValue.Value - amount
@@ -44,6 +56,10 @@ function MoneyService.RemoveMoney(player, amount)
 end
 
 function MoneyService.GetMoney(player)
+	if player == nil then
+		warn("Player is nil")
+		return
+	end
 	local moneyValue = player.Data:FindFirstChild("Money")
 	if moneyValue then
 		return moneyValue.Value
@@ -52,6 +68,10 @@ function MoneyService.GetMoney(player)
 end
 
 function MoneyService.CanAfford(player, cost)
+	if player == nil then
+		warn("Player is nil")
+		return
+	end
 	local moneyValue = player.Data:FindFirstChild("Money")
 	if moneyValue then
 		return moneyValue.Value >= cost

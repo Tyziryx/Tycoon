@@ -13,6 +13,10 @@ function TycoonService.Init()
 end
 
 function TycoonService.AssignTycoon(player)
+	if player == nil then
+		warn("Player is nil")
+		return nil
+	end
 	for _, tycoon in Tycoons:GetChildren() do
 		if tycoon:GetAttribute("Taken") then
 			continue
@@ -25,6 +29,10 @@ function TycoonService.AssignTycoon(player)
 end
 
 function TycoonService.GetTycoon(player)
+	if player == nil then
+		warn("Player is nil")
+		return nil
+	end
 	for _, tycoon in Tycoons:GetChildren() do
 		if tycoon:GetAttribute("UserId") == player.UserId then
 			return tycoon
@@ -32,7 +40,11 @@ function TycoonService.GetTycoon(player)
 	end
 end
 
-function getMachineInTycoonById(machineId)
+function TycoonService.GetMachineInTycoonById(machineId)
+	if machineId == nil then
+		warn("MachineId is nil")
+		return nil
+	end
 	for _, Machine in PlaceholderTycoon.Machines:GetChildren() do
 		if Machine:GetAttribute("Id") == machineId then
 			return Machine
@@ -41,7 +53,11 @@ function getMachineInTycoonById(machineId)
 end
 
 function TycoonService.GetRelativeCFrame(machineId)
-	local Machines = getMachineInTycoonById(machineId)
+	if machineId == nil then
+		warn("MachineId is nil")
+		return nil
+	end
+	local Machines = TycoonService.GetMachineInTycoonById(machineId)
 
 	local RelativeCF = PlaceholderTycoon.PrimaryPart.CFrame:toObjectSpace(Machines:GetPivot())
 	return RelativeCF

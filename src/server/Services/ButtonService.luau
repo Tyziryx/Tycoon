@@ -42,8 +42,8 @@ function ButtonService.Init()
 			if not success then
 				return
 			end
-			Button.Transparency = 1
-			Button.Cost.Enabled = false
+
+			ButtonService.HideButton(Button)
 			Button:SetAttribute("Unlocked", true)
 			ButtonService.RequireButton(Button, player)
 		end)
@@ -80,8 +80,15 @@ function ButtonService.UpdateButton()
 end
 
 function ButtonService.HideButton(button)
+	if button == nil then
+		warn("Button is nil")
+		return
+	end
 	if button:IsA("BasePart") then
 		button.Transparency = 1
+		if button:FindFirstChild("Base") then
+			button.Base.Transparency = 1
+		end
 		button.Cost.Enabled = false
 		if button:FindFirstChild("ClickDetector") then
 			button.ClickDetector.MaxActivationDistance = 0
@@ -90,8 +97,15 @@ function ButtonService.HideButton(button)
 end
 
 function ButtonService.ButtonShow(button)
+	if button == nil then
+		warn("Button is nil")
+		return
+	end
 	if button:IsA("BasePart") then
 		button.Transparency = 0
+		if button:FindFirstChild("Base") then
+			button.Base.Transparency = 0
+		end
 		button.Cost.Enabled = true
 		if button:FindFirstChild("ClickDetector") then
 			button.ClickDetector.MaxActivationDistance = 32
@@ -108,6 +122,14 @@ function ButtonService.GetButton(machineId)
 end
 
 function ButtonService.RequireButton(parentButton, player)
+	if parentButton == nil then
+		warn("ParentButton is nil")
+		return
+	end
+	if player == nil then
+		warn("Player is nil")
+		return
+	end
 	local machineId = parentButton:GetAttribute("machineId")
 	local requiredButtonId = MachineConfig[machineId].NextButton
 	local childButton = ButtonService.GetButton(requiredButtonId)

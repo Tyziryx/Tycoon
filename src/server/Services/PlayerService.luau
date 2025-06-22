@@ -12,6 +12,10 @@ local TyconnService = require(script.Parent.TycoonService)
 local PlayerService = {}
 
 function PlayerService.OnPlayerAdded(player)
+	if player == nil then
+		warn("Player is nil")
+		return
+	end
 	local dataFolder = Instance.new("Folder")
 	dataFolder.Name = "Data"
 	dataFolder.Parent = player
@@ -71,6 +75,10 @@ end
 
 function PlayerService.UpdatePlayer()
 	for _, player in Players:GetPlayers() do
+		if player == nil then
+			warn("Player is nil")
+			return
+		end
 		local totalIncome = 0
 		local ownedMachines = player.Data.OwnedMachines
 		for _, machine in ownedMachines:GetChildren() do

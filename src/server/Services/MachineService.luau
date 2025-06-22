@@ -12,6 +12,10 @@ local Machines = ReplicatedStorage:WaitForChild("Machines")
 
 -- local function getMachine(machineId)
 function MachineService.GetMachine(machineId)
+	if machineId == nil then
+		warn("MachineId is nil")
+		return nil
+	end
 	for _, Machine in Machines:GetChildren() do
 		if Machine:GetAttribute("Id") == machineId then
 			return Machine
@@ -28,7 +32,6 @@ function MachineService.UnlockMachine(player, machineId)
 	local UnlockedZones = player.Data.UnlockedZones
 	local zoneId = machineConfig.ZoneRequired
 	local zoneConfig = ZoneConfig[zoneId]
-	print(zoneId)
 	if not UnlockedZones:GetChildren()[zoneId] then
 		return false
 	end
