@@ -2,11 +2,11 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
-local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
+-- local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
 
 local MoneyService = require(script.Parent.MoneyService)
 local PollutionService = require(script.Parent.PollutionService)
-local DefaultPlayerData = require(script.Parent.Parent.Data.PlayerData)
+local DefaultPlayerData = require(ReplicatedStorage.Shared.Config.PlayerData)
 local TyconnService = require(script.Parent.TycoonService)
 
 local PlayerService = {}
@@ -80,14 +80,10 @@ function PlayerService.updatePlayer()
 			warn("Player is nil")
 			return
 		end
-		local totalIncome = 0
-		local ownedMachines = player.Data.OwnedMachines
-		for _, machine in ownedMachines:GetChildren() do
-			local machineId = machine.Value
-			local machineConfig = MachineConfig[machineId]
-			local income = machineConfig.BaseIncome
-			totalIncome = totalIncome + income
-		end
+
+		-- Utiliser le nouveau système pour calculer les revenus
+		local PurchasableService = require(script.Parent.PurchasableService)
+		local totalIncome = PurchasableService.calculateTotalIncome(player)
 		PollutionService.addPollution(player, totalIncome)
 	end
 end

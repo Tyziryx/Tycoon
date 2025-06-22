@@ -11,10 +11,11 @@ local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
 local PlayerService = require(script.Services.PlayerService)
 local ButtonService = require(script.Services.ButtonService)
 local TycoonService = require(script.Services.TycoonService)
-local MachineService = require(script.Services.MachineService)
+local PurchasableService = require(script.Services.PurchasableService)
 
 PlayerService.init()
 TycoonService.init()
+PurchasableService.init()
 wait(2)
 ButtonService.init()
 

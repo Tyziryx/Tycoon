@@ -1,10 +1,12 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
+local DecorationConfig = require(ReplicatedStorage.Shared.Config.DecorationConfig)
+local ButtonConfig = require(ReplicatedStorage.Shared.Config.ButtonConfig)
 
 local Workspace = game:GetService("Workspace")
 local TycoonService = require(script.Parent.TycoonService)
-local MachineService = require(script.Parent.MachineService)
+local PurchasableService = require(script.Parent.PurchasableService)
 local MoneyService = require(script.Parent.MoneyService)
 local ButtonService = {}
 
@@ -16,11 +18,29 @@ function ButtonService.init()
 	end)
 
 	for _, Button in CollectionService:GetTagged("TycoonButton") do
-		local machineId = Button:GetAttribute("machineId")
-		local Cost = MachineConfig[machineId].BaseCost
-		local MachineName = MachineConfig[machineId].Name
+		local buttonId = Button:GetAttribute("machineId")
+		if not buttonId or not ButtonConfig[buttonId] then
+			warn("Button mal configuré:", buttonId)
+			continue
+		end
 
-		Button.Cost:GetChildren()[1].Text = MachineName .. " " .. Cost .. " $"
+		local buttonConfig = ButtonConfig[buttonId]
+		local buttonType = buttonConfig.Type
+		local targetId = buttonConfig.TargetId
+
+		-- Obtenir les infos en fonction du type
+		local cost, name
+		if buttonType == "Machine" then
+			local machineConfig = MachineConfig[targetId]
+			cost = machineConfig.BaseCost
+			name = machineConfig.Name
+		elseif buttonType == "Decoration" then
+			local decorationConfig = DecorationConfig[targetId]
+			cost = decorationConfig.BaseCost
+			name = decorationConfig.Name
+		end
+
+		Button.Cost:GetChildren()[1].Text = buttonConfig.Text or (name .. " " .. cost .. " $")
 
 		Button.Touched:Connect(function(hit)
 			if Button:GetAttribute("Unlocked") then
@@ -28,13 +48,11 @@ function ButtonService.init()
 			end
 
 			local player = game.Players:GetPlayerFromCharacter(hit.Parent)
-
 			if not player then
 				return
 			end
 
 			local tycoon = TycoonService.getTycoon(player)
-
 			if not tycoon then
 				return
 			end
@@ -42,7 +60,13 @@ function ButtonService.init()
 				return
 			end
 
-			local success = MachineService.unlockMachine(player, machineId)
+			local success = false
+			if buttonType == "Machine" then
+				success = PurchasableService.unlockMachine(player, targetId)
+			elseif buttonType == "Decoration" then
+				success = PurchasableService.unlockDecoration(player, targetId)
+			end
+
 			if not success then
 				return
 			end
@@ -51,7 +75,9 @@ function ButtonService.init()
 			Button:SetAttribute("Unlocked", true)
 			ButtonService.requireButton(Button, player)
 		end)
-		if machineId == 1 then
+
+		-- Afficher le premier bouton par défaut
+		if buttonId == 1 or buttonId == 1001 then -- Premier bouton machine ou décoration
 			ButtonService.buttonShow(Button)
 		else
 			ButtonService.hideButton(Button)
@@ -64,10 +90,26 @@ function ButtonService.updateButton()
 		if not button:IsDescendantOf(Workspace.Tycoons) then
 			continue
 		end
-		local machineId = button:GetAttribute("machineId")
-		local cost = MachineConfig[machineId].BaseCost
-		local playerId = button.Parent.Parent:GetAttribute("UserId")
 
+		local buttonId = button:GetAttribute("machineId")
+		if not buttonId or not ButtonConfig[buttonId] then
+			continue
+		end
+
+		local buttonConfig = ButtonConfig[buttonId]
+		local buttonType = buttonConfig.Type
+		local targetId = buttonConfig.TargetId
+
+		-- Obtenir le coût en fonction du type
+		local cost
+		if buttonType == "Machine" then
+			cost = MachineConfig[targetId].BaseCost
+		elseif buttonType == "Decoration" then
+			cost = DecorationConfig[targetId].BaseCost
+		end
+
+		local playerId = button.Parent.Parent:GetAttribute("UserId")
+		print("playerId: " .. playerId)
 		if playerId == nil or type(playerId) ~= "number" then
 			return
 		end
