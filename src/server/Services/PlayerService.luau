@@ -57,7 +57,6 @@ function PlayerService.OnPlayerAdded(player)
 	local moneyValue = dataFolder:FindFirstChild("Money")
 	if moneyValue then
 		moneyValue.Value = GameConfig.STARTING_MONEY
-		print("Money set to " .. GameConfig.STARTING_MONEY)
 	end
 
 	MoneyService.SetupLeaderstats(player)
@@ -70,7 +69,7 @@ end
 
 function PlayerService.UpdatePlayer()
 	for _, player in Players:GetPlayers() do
-		MoneyService.AddMoney(player, 20)
+		MoneyService.AddMoney(player, 10)
 	end
 end
 

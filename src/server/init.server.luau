@@ -23,5 +23,5 @@ print("Serveur initialisé avec succès!")
 while true do
 	PlayerService.UpdatePlayer()
 	ButtonService.UpdateButton()
-	task.wait(1)
+	task.wait(GameConfig.GENERATION_INTERVAL)
 end

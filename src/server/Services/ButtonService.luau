@@ -8,17 +8,25 @@ local ButtonService = {}
 
 function ButtonService.Init()
 	for _, Button in CollectionService:GetTagged("TycoonButton") do
+		local Machine = MachineService.GetMachine(Button:GetAttribute("machineId"))
+		local Cost = Machine:GetAttribute("Cost")
+		local MachineName = Machine.Name
+
+		Button.Cost:GetChildren()[1].Text = MachineName .. " " .. Cost .. " $"
+
 		Button.Touched:Connect(function(hit)
-			print("Touched by: ", hit:GetFullName())
 			if Button:GetAttribute("Unlocked") then
 				return
 			end
+
 			local player = game.Players:GetPlayerFromCharacter(hit.Parent)
+
 			if not player then
 				return
 			end
 
 			local tycoon = TycoonService.GetTycoon(player)
+
 			if not tycoon then
 				return
 			end
@@ -27,6 +35,7 @@ function ButtonService.Init()
 			end
 
 			local success = MachineService.UnlockMachine(player, Button:GetAttribute("machineId"))
+
 			if not success then
 				return
 			end
