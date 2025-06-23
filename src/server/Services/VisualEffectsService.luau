@@ -16,23 +16,8 @@ local EffectsConfig = {
 				},
 				levelScaling = {
 					[1] = { Rate = 10 },
-					[2] = { Rate = 5000 },
+					[2] = { Rate = 100 },
 					[3] = { Rate = 10000 },
-				},
-			},
-			-- Note: Smoke n'a pas de propriété Rate, on peut ajuster Size à la place
-			{
-				type = "Smoke",
-				properties = {
-					Size = 3,
-					Opacity = 0.6,
-					RiseVelocity = 5,
-					Color = Color3.fromRGB(50, 50, 50),
-				},
-				levelScaling = {
-					[1] = { Size = 3 },
-					[2] = { Size = 5 },
-					[3] = { Size = 8 },
 				},
 			},
 		},
@@ -53,10 +38,6 @@ local EffectsConfig = {
 	-- }
 }
 
-function VisualEffectsService.init()
-	print("VisualEffectsService initialisé - Système d'effets modulaire prêt")
-end
-
 -- Fonction principale pour configurer les effets d'une machine
 function VisualEffectsService.setupMachineEffects(machine, machineName, level)
 	level = level or 1
@@ -66,8 +47,6 @@ function VisualEffectsService.setupMachineEffects(machine, machineName, level)
 		-- Pas d'effets configurés pour cette machine
 		return
 	end
-
-	print("Configuration des effets pour", machineName, "niveau", level)
 
 	-- Trouver la partie cible pour les effets
 	local targetPart = VisualEffectsService.findTargetPart(machine, config.targetParts)
@@ -147,7 +126,6 @@ function VisualEffectsService.setupEffect(targetPart, effectConfig, level)
 		for property, value in pairs(levelConfig) do
 			if existingEffect[property] ~= nil then
 				existingEffect[property] = value
-				print("  -", effectType, property, "=", value, "pour niveau", level)
 			end
 		end
 	end
@@ -160,7 +138,6 @@ function VisualEffectsService.updateMachineEffects(machine, newLevel)
 		return
 	end
 
-	print("Mise à jour des effets de", machineName, "vers niveau", newLevel)
 	VisualEffectsService.setupMachineEffects(machine, machineName, newLevel)
 end
 
@@ -173,7 +150,7 @@ function VisualEffectsService.intensifyEffects(machine, duration, multiplier)
 	local effects = {}
 	local function findEffects(parent)
 		for _, child in parent:GetChildren() do
-			if child:IsA("Fire") or child:IsA("Smoke") then
+			if child:IsA("Fire") then
 				table.insert(effects, child)
 			end
 			if child:IsA("Model") or child:IsA("BasePart") then
@@ -192,11 +169,6 @@ function VisualEffectsService.intensifyEffects(machine, duration, multiplier)
 		if effect:IsA("Fire") then
 			originalValues[effect].Size = effect.Size
 			effect.Size = effect.Size * multiplier
-		elseif effect:IsA("Smoke") then
-			originalValues[effect].Size = effect.Size
-			originalValues[effect].Opacity = effect.Opacity
-			effect.Size = effect.Size * multiplier
-			effect.Opacity = math.min(1, effect.Opacity * multiplier)
 		end
 	end
 
@@ -216,7 +188,6 @@ end
 -- Fonction pour ajouter facilement de nouveaux types de machines
 function VisualEffectsService.registerMachineType(machineName, config)
 	EffectsConfig[machineName] = config
-	print("Nouveau type de machine enregistré:", machineName)
 end
 
 return VisualEffectsService

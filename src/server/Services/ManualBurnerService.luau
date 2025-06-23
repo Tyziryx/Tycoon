@@ -11,11 +11,6 @@ local BurnerConfig = {
 	LEVEL_MULTIPLIER = 2, -- multiplicateur par niveau
 }
 
-function ManualBurnerService.init()
-	-- Le service est initialisé mais la configuration se fait au spawn de chaque machine
-	print("ManualBurnerService initialisé - Prêt à configurer les brûleurs")
-end
-
 -- Fonction pour vérifier si une machine est un feu de camp
 function ManualBurnerService.isCampFire(machineId)
 	return machineId == 1 or machineId == 2 or machineId == 3
@@ -25,22 +20,10 @@ end
 function ManualBurnerService.onMachineSpawned(machine, tycoon, machineId)
 	if ManualBurnerService.isCampFire(machineId) then
 		ManualBurnerService.setupBurner(machine, tycoon)
-		print("Brûleur manuel configuré automatiquement pour machine ID:", machineId)
 	end
 end
 
 function ManualBurnerService.setupBurner(campfire, tycoon)
-	-- Debug : afficher la structure du modèle
-	print("=== Structure du feu de camp ===")
-	print("Nom du modèle:", campfire.Name)
-	print("Type:", campfire.ClassName)
-	print("PrimaryPart:", campfire.PrimaryPart and campfire.PrimaryPart.Name or "Aucune")
-
-	for _, child in campfire:GetChildren() do
-		print(" -", child.Name, "(" .. child.ClassName .. ")")
-	end
-	print("================================")
-
 	-- Ajouter un ClickDetector au feu de camp
 	local clickDetector = campfire:FindFirstChild("ClickDetector")
 	if not clickDetector then
@@ -56,8 +39,6 @@ function ManualBurnerService.setupBurner(campfire, tycoon)
 	clickDetector.MouseClick:Connect(function(player)
 		ManualBurnerService.handleBurn(player, campfire, tycoon)
 	end)
-
-	print("Brûleur manuel configuré pour:", campfire.Name)
 end
 
 function ManualBurnerService.handleBurn(player, campfire, tycoon)
@@ -90,8 +71,6 @@ function ManualBurnerService.handleBurn(player, campfire, tycoon)
 	-- Effets visuels d'intensification temporaire
 	local VisualEffectsService = require(script.Parent.VisualEffectsService)
 	VisualEffectsService.intensifyEffects(campfire, 1, 1.5)
-
-	print(player.Name .. " a brûlé des déchets ! +" .. pollutionGenerated .. " pollution")
 end
 
 function ManualBurnerService.addVisualEffects(campfire)
@@ -134,7 +113,6 @@ function ManualBurnerService.addVisualEffects(campfire)
 
 	-- Les effets visuels sont maintenant gérés par VisualEffectsService
 	-- On n'a plus besoin de les créer manuellement ici
-	print("Brûleur configuré - Effets gérés par VisualEffectsService")
 end
 
 function ManualBurnerService.playBurnEffect(campfire, pollution)

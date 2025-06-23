@@ -137,7 +137,6 @@ function Machine:upgrade(player)
 	-- Mettre à jour l'attribut sur toutes les instances de cette machine dans le monde
 	self:updateLevelAttributes()
 
-	print("Machine améliorée au niveau " .. self.currentLevel)
 	return true, "Machine améliorée au niveau " .. self.currentLevel
 end
 

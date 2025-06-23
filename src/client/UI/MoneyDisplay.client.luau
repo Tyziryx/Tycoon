@@ -23,5 +23,5 @@ local function updateMoneyText()
 end
 
 money.Changed:Connect(updateMoneyText)
-+
+
 updateMoneyText()

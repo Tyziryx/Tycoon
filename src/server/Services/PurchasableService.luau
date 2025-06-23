@@ -27,8 +27,6 @@ function PurchasableService.init()
 		local decoration = Decoration.new(decorationId, config)
 		purchasableInstances[decorationId] = decoration
 	end
-
-	print("PurchasableService initialisé avec", #purchasableInstances, "objets achetables")
 end
 
 function PurchasableService.getPurchasable(id)

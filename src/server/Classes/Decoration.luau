@@ -49,7 +49,6 @@ function Decoration:spawn(tycoon)
 
 	clonedDecoration.Parent = decorationsFolder
 
-	print("Décoration spawnée:", self.name, "Catégorie:", self.category)
 	return true
 end
 
