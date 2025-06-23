@@ -131,8 +131,13 @@ function TycoonService.initializeSellPoint(tycoon)
 			warn("Pollution is nil")
 			return
 		end
+
+		local moneyToAdd = math.floor(pollution / 10)
+		if pollution > 0 and moneyToAdd == 0 then
+			moneyToAdd = 1
+		end
 		PollutionService.removePollution(player, pollution)
-		MoneyService.addMoney(player, pollution)
+		MoneyService.addMoney(player, moneyToAdd)
 		updateButtonsEvent:Fire()
 	end)
 end
