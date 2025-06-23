@@ -10,11 +10,12 @@ function Machine.new(id, config)
 	setmetatable(self, Machine)
 
 	-- Propriétés spécifiques aux machines
+	self.baseCost = config.BaseCost or 0
 	self.baseIncome = config.BaseIncome or 0
 	self.maxLevel = config.MaxLevel or 1
 	self.currentLevel = 1
-	self.upgradeCost = config.UpgradeCost
-	self.upgradeIncome = config.UpgradeIncome
+	self.upgradeCost = config.BaseCost * (self.currentLevel - 1) * 5
+	self.upgradeIncome = 0
 
 	return self
 end
@@ -36,7 +37,6 @@ function Machine:spawn(tycoon)
 	clonedMachine:PivotTo(worldCF)
 	clonedMachine.Parent = tycoon.Machines
 
-	print("Machine spawnée:", self.name)
 	return true
 end
 
@@ -63,10 +63,12 @@ function Machine:generateIncome()
 	end
 
 	local baseIncome = self.baseIncome
-	if self.upgradeIncome then
-		baseIncome = self.upgradeIncome(self.currentLevel)
+	if self.currentLevel == 2 then
+		baseIncome *= 1.5
+	elseif self.currentLevel == 3 then
+		baseIncome *= 2
 	end
-
+	print("Revenus: " .. baseIncome .. " p/s")
 	return baseIncome
 end
 
@@ -78,12 +80,13 @@ function Machine:getUpgradeCost()
 	if not self:canUpgrade() then
 		return nil
 	end
-
-	if self.upgradeCost then
-		return self.upgradeCost(self.currentLevel + 1)
+	local cost = self.baseCost * self.currentLevel * 5
+	if self.id == 1 and self.currentLevel == 1 then
+		cost = 100
+	elseif self.id == 1 and self.currentLevel == 2 then
+		cost = 200
 	end
-
-	return nil
+	return cost
 end
 
 function Machine:upgrade(player)
@@ -100,10 +103,9 @@ function Machine:upgrade(player)
 	if not MoneyService.canAfford(player, cost) then
 		return false, "Pas assez d'argent pour améliorer"
 	end
-
 	MoneyService.removeMoney(player, cost)
 	self.currentLevel = self.currentLevel + 1
-
+	print("Machine améliorée au niveau " .. self.currentLevel)
 	return true, "Machine améliorée au niveau " .. self.currentLevel
 end
 

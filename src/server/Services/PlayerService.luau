@@ -81,7 +81,6 @@ function PlayerService.updatePlayer()
 			return
 		end
 
-		-- Utiliser le nouveau système pour calculer les revenus
 		local PurchasableService = require(script.Parent.PurchasableService)
 		local totalIncome = PurchasableService.calculateTotalIncome(player)
 		PollutionService.addPollution(player, totalIncome)

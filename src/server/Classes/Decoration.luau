@@ -83,32 +83,4 @@ function Decoration:getAssetModel()
 	return nil
 end
 
--- Méthodes spécifiques aux décorations
-function Decoration:getBeautyValue()
-	-- Les décorations pourraient ajouter une valeur "beauté" au tycoon
-	local baseBeauty = 1
-	if self.category == "Art" then
-		baseBeauty = 5
-	elseif self.category == "Plants" then
-		baseBeauty = 3
-	elseif self.category == "Lighting" then
-		baseBeauty = 2
-	end
-
-	return baseBeauty
-end
-
-function Decoration:applyEffect(tycoon)
-	-- Les décorations pourraient avoir des effets spéciaux
-	-- Par exemple, améliorer le moral des visiteurs, augmenter les revenus, etc.
-
-	if self.category == "Lighting" then
-		-- Améliorer la visibilité la nuit
-		print("Éclairage amélioré pour le tycoon")
-	elseif self.category == "Plants" then
-		-- Réduire légèrement la pollution
-		print("Pollution réduite grâce aux plantes")
-	end
-end
-
 return Decoration
