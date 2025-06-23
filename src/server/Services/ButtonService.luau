@@ -9,6 +9,10 @@ local PurchasableService = require(script.Parent.PurchasableService)
 local MoneyService = require(script.Parent.MoneyService)
 local ButtonService = {}
 
+local redButton = Color3.fromRGB(196, 81, 81)
+local greenButton = Color3.fromRGB(42, 221, 42)
+local blueButton = Color3.fromRGB(100, 150, 255)
+
 function ButtonService.init()
 	-- Écouter l'événement pour mettre à jour les boutons immédiatement
 	local updateButtonsEvent = ReplicatedStorage:WaitForChild("UpdateButtons")
@@ -50,7 +54,7 @@ function ButtonService.init()
 			-- Protection anti-spam : éviter les clics multiples rapides
 			local lastClickTime = Button:GetAttribute("LastClickTime") or 0
 			local currentTime = tick()
-			if currentTime - lastClickTime < 1 then -- Délai de 1 seconde
+			if currentTime - lastClickTime < 0.5 then -- Délai de 1 seconde
 				return
 			end
 			Button:SetAttribute("LastClickTime", currentTime)
@@ -72,8 +76,6 @@ function ButtonService.init()
 			else
 				targetId = buttonId - 1000
 			end
-
-			local machine = PurchasableService.getMachine(targetId)
 
 			-- Vérifier si le joueur possède cette machine
 			local playerOwnsMachine = ButtonService.playerOwnsMachine(player, targetId)
@@ -140,18 +142,18 @@ function ButtonService.updateButton()
 			if player and machine and machine:canUpgrade() then
 				local upgradeCost = machine:getUpgradeCost()
 				if MoneyService.canAfford(player, upgradeCost) then
-					button.Color = Color3.fromRGB(100, 150, 255) -- Bleu si peut upgrade
+					button.Color = blueButton -- Bleu si peut upgrade
 				else
-					button.Color = Color3.fromRGB(196, 81, 81) -- Rouge si pas assez d'argent
+					button.Color = redButton -- Rouge si pas assez d'argent
 				end
 			end
 		else
 			-- Logique pour boutons d'achat
 			if cost and player then
 				if MoneyService.canAfford(player, cost) then
-					button.Color = Color3.fromRGB(42, 221, 42)
+					button.Color = greenButton
 				else
-					button.Color = Color3.fromRGB(196, 81, 81) -- Rouge si pas assez d'argent
+					button.Color = redButton
 				end
 			end
 		end
@@ -219,7 +221,7 @@ end
 
 function ButtonService.convertToUpgradeButton(button, machineId)
 	-- Changer l'apparence
-	button.Color = Color3.fromRGB(196, 81, 81)
+	button.Color = redButton
 
 	-- Changer le texte
 	ButtonService.updateUpgradeButtonText(button, machineId)
@@ -238,9 +240,6 @@ function ButtonService.updateUpgradeButtonText(button, machineId)
 		local upgradeCost = machine:getUpgradeCost()
 		local nextLevel = machine.currentLevel + 1
 		button.Cost:GetChildren()[1].Text = "Upgrade " .. name .. " Lvl." .. nextLevel .. " - " .. upgradeCost .. "$"
-	else
-		button.Cost:GetChildren()[1].Text = name .. " (MAX LEVEL)"
-		button.Color = Color3.fromRGB(128, 128, 128) -- Gris pour max level
 	end
 end
 
@@ -251,7 +250,12 @@ function ButtonService.handleUpgrade(button, player, machineId)
 		return
 	end
 
-	local success, message = PurchasableService.upgradeMachine(player, machineId)
+	local success = PurchasableService.upgradeMachine(player, machineId)
+	-- Vérifier si la machine a atteint le niveau maximum après l'upgrade
+	if machine.currentLevel >= machine.maxLevel then
+		button:Destroy()
+		return
+	end
 
 	if success then
 		ButtonService.updateUpgradeButtonText(button, machineId)

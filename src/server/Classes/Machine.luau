@@ -68,7 +68,6 @@ function Machine:generateIncome()
 	elseif self.currentLevel == 3 then
 		baseIncome *= 2
 	end
-	print("Revenus: " .. baseIncome .. " p/s")
 	return baseIncome
 end
 
