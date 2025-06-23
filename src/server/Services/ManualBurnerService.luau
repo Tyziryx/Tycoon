@@ -133,6 +133,7 @@ function ManualBurnerService.playBurnEffect(campfire, pollution)
 	end
 
 	findEffects(campfire)
+	print("Found smoke:", smoke)
 
 	if smoke then
 		local originalSize = smoke.Size
@@ -165,6 +166,7 @@ function ManualBurnerService.playBurnEffect(campfire, pollution)
 end
 
 function ManualBurnerService.createFloatingText(campfire, text)
+	print("Creating floating text for", text)
 	-- Créer un GUI temporaire pour afficher les gains
 	local billboardGui = Instance.new("BillboardGui")
 	billboardGui.Size = UDim2.new(0, 200, 0, 50)

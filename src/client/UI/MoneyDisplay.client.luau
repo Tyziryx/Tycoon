@@ -6,9 +6,10 @@ local StringUtils = require(ReplicatedStorage.Shared.Utils.StringUtils)
 local leaderstats = player:WaitForChild("leaderstats")
 local money = leaderstats:WaitForChild("Money")
 
-local moneyDisplay = player.PlayerGui:WaitForChild("MoneyDisplay")
-local frame = moneyDisplay:WaitForChild("MoneyBar")
-local moneyText = frame:WaitForChild("TextLabel")
+local moneyDisplay = player.PlayerGui:WaitForChild("ScreenGUI")
+local header = moneyDisplay:WaitForChild("Header")
+local moneyBar = header:WaitForChild("MoneyBar")
+local moneyText = moneyBar:WaitForChild("TextLabel")
 
 -- Fonction pour mettre à jour le texte avec formatage
 local function updateMoneyText()

@@ -20,6 +20,19 @@ local EffectsConfig = {
 					[3] = { Rate = 10000 },
 				},
 			},
+			-- Fumée basique sans scaling pour l'instant
+			{
+				type = "Smoke",
+				properties = {
+					Size = NumberSequence.new(3),
+					Opacity = 0.6,
+					RiseVelocity = 5,
+					Color = Color3.fromRGB(50, 50, 50),
+				},
+				levelScaling = {
+					-- Pas de scaling pour l'instant, fumée constante
+				},
+			},
 		},
 		-- Parties où chercher/attacher les effets
 		targetParts = { "FIRE", "Flames", "Center", "PrimaryPart", "FirstBasePart" },
@@ -150,7 +163,7 @@ function VisualEffectsService.intensifyEffects(machine, duration, multiplier)
 	local effects = {}
 	local function findEffects(parent)
 		for _, child in parent:GetChildren() do
-			if child:IsA("Fire") then
+			if child:IsA("Fire") or child:IsA("Smoke") then
 				table.insert(effects, child)
 			end
 			if child:IsA("Model") or child:IsA("BasePart") then
@@ -169,6 +182,13 @@ function VisualEffectsService.intensifyEffects(machine, duration, multiplier)
 		if effect:IsA("Fire") then
 			originalValues[effect].Size = effect.Size
 			effect.Size = effect.Size * multiplier
+		elseif effect:IsA("Smoke") then
+			originalValues[effect].Size = effect.Size
+			originalValues[effect].Opacity = effect.Opacity
+			-- Pour Smoke.Size (NumberSequence), on augmente la valeur principale
+			local currentSize = effect.Size.Keypoints[1].Value
+			effect.Size = NumberSequence.new(currentSize * multiplier)
+			effect.Opacity = math.min(1, effect.Opacity * multiplier)
 		end
 	end
 
