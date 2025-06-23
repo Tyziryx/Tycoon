@@ -40,6 +40,10 @@ function Machine:spawn(tycoon)
 	-- Sauvegarder le niveau en attribut pour accès externe
 	clonedMachine:SetAttribute("CurrentLevel", self.currentLevel)
 
+	-- Configurer les effets visuels
+	local VisualEffectsService = require(script.Parent.Parent.Services.VisualEffectsService)
+	VisualEffectsService.setupMachineEffects(clonedMachine, self.name, self.currentLevel)
+
 	-- Configurer le brûleur manuel si c'est un feu de camp
 	local ManualBurnerService = require(script.Parent.Parent.Services.ManualBurnerService)
 	ManualBurnerService.onMachineSpawned(clonedMachine, tycoon, self.id)
@@ -97,12 +101,16 @@ end
 
 function Machine:updateLevelAttributes()
 	-- Mettre à jour l'attribut CurrentLevel sur toutes les instances de cette machine
+	local VisualEffectsService = require(script.Parent.Parent.Services.VisualEffectsService)
+
 	for _, tycoon in game.Workspace.Tycoons:GetChildren() do
 		local machines = tycoon:FindFirstChild("Machines")
 		if machines then
 			for _, machine in machines:GetChildren() do
 				if machine:GetAttribute("Id") == self.id then
 					machine:SetAttribute("CurrentLevel", self.currentLevel)
+					-- Mettre à jour les effets visuels
+					VisualEffectsService.updateMachineEffects(machine, self.currentLevel)
 				end
 			end
 		end

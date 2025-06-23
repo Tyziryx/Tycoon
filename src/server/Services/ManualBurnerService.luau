@@ -87,8 +87,9 @@ function ManualBurnerService.handleBurn(player, campfire, tycoon)
 	-- Donner les récompenses
 	PollutionService.addPollution(player, pollutionGenerated)
 
-	-- Effets visuels
-	ManualBurnerService.playBurnEffect(campfire, pollutionGenerated)
+	-- Effets visuels d'intensification temporaire
+	local VisualEffectsService = require(script.Parent.VisualEffectsService)
+	VisualEffectsService.intensifyEffects(campfire, 1, 1.5)
 
 	print(player.Name .. " a brûlé des déchets ! +" .. pollutionGenerated .. " pollution")
 end
@@ -131,18 +132,9 @@ function ManualBurnerService.addVisualEffects(campfire)
 		targetPart.Parent = campfire
 	end
 
-	-- Ajouter des particules de fumée
-	local smoke = targetPart:FindFirstChild("Smoke")
-	if not smoke then
-		smoke = Instance.new("Smoke")
-		smoke.Size = 3
-		smoke.Opacity = 0.6
-		smoke.RiseVelocity = 5
-		smoke.Color = Color3.fromRGB(50, 50, 50)
-		smoke.Parent = targetPart
-	end
-
-	print("Effets visuels ajoutés à:", targetPart.Name, "dans", campfire.Name)
+	-- Les effets visuels sont maintenant gérés par VisualEffectsService
+	-- On n'a plus besoin de les créer manuellement ici
+	print("Brûleur configuré - Effets gérés par VisualEffectsService")
 end
 
 function ManualBurnerService.playBurnEffect(campfire, pollution)
