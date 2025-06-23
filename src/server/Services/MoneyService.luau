@@ -1,5 +1,19 @@
 local MoneyService = {}
 
+function MoneyService.init()
+	-- Créer une RemoteFunction pour permettre au client de récupérer le montant d'argent
+	local remoteFunction = Instance.new("RemoteFunction")
+	remoteFunction.Name = "GetMoneyRemote"
+	remoteFunction.Parent = game:GetService("ReplicatedStorage")
+
+	-- La fonction appelée par le client pour obtenir l'argent
+	remoteFunction.OnServerInvoke = function(player)
+		return MoneyService.getMoney(player)
+	end
+
+	print("MoneyService initialisé!")
+end
+
 function MoneyService.setupLeaderstats(player)
 	if player == nil then
 		warn("Player is nil")

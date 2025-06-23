@@ -1,5 +1,5 @@
 local GameConfig = {
-	STARTING_MONEY = 10000,
+	STARTING_MONEY = 10,
 	GENERATION_INTERVAL = 1,
 }
 
