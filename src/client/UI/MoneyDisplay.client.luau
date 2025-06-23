@@ -10,6 +10,7 @@ local moneyDisplay = player.PlayerGui:WaitForChild("ScreenGUI")
 local header = moneyDisplay:WaitForChild("Header")
 local moneyBar = header:WaitForChild("MoneyBar")
 local moneyText = moneyBar:WaitForChild("TextLabel")
+local backgroundImage = moneyBar:WaitForChild("Anim")
 
 -- Fonction pour mettre à jour le texte avec formatage
 local function updateMoneyText()
@@ -22,7 +23,18 @@ local function updateMoneyText()
 	-- Mettre à jour le texte
 	moneyText.Text = formattedMoney
 end
-
 money.Changed:Connect(updateMoneyText)
 
 updateMoneyText()
+
+local function rotateImage()
+	local rotationSpeed = 0.5
+
+	while true do
+		backgroundImage.Rotation = (backgroundImage.Rotation + rotationSpeed) % 360
+
+		task.wait()
+	end
+end
+
+task.spawn(rotateImage)

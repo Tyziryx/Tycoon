@@ -121,11 +121,19 @@ function TycoonService.initializeSellPoint(tycoon)
 		return
 	end
 
+	-- Créer un son à l'avance et l'ajouter au Mafia
+	local conversionSound = Instance.new("Sound")
+	conversionSound.Name = "ConversionSound"
+	conversionSound.SoundId = "rbxassetid://133292918309565" -- Remplacez par votre ID de son
+	conversionSound.Volume = 0.8
+	conversionSound.Parent = Mafia
+
 	Prompt.Triggered:Connect(function(player)
 		if player == nil then
 			warn("Player is nil")
 			return
 		end
+
 		local pollution = PollutionService.getPollution(player)
 		if pollution == nil then
 			warn("Pollution is nil")
@@ -138,6 +146,18 @@ function TycoonService.initializeSellPoint(tycoon)
 		end
 		PollutionService.removePollution(player, pollution)
 		MoneyService.addMoney(player, moneyToAdd)
+
+		-- Jouer le son après la conversion
+		conversionSound:Play()
+
+		-- Optionnel: effets visuels simples
+		local sparkles = Instance.new("Sparkles")
+		sparkles.Parent = PromptBlock
+		sparkles.SparkleColor = Color3.fromRGB(255, 215, 0)
+		task.delay(2, function()
+			sparkles:Destroy()
+		end)
+
 		updateButtonsEvent:Fire()
 	end)
 end
