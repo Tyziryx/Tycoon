@@ -37,6 +37,13 @@ function Machine:spawn(tycoon)
 	clonedMachine:PivotTo(worldCF)
 	clonedMachine.Parent = tycoon.Machines
 
+	-- Sauvegarder le niveau en attribut pour accès externe
+	clonedMachine:SetAttribute("CurrentLevel", self.currentLevel)
+
+	-- Configurer le brûleur manuel si c'est un feu de camp
+	local ManualBurnerService = require(script.Parent.Parent.Services.ManualBurnerService)
+	ManualBurnerService.onMachineSpawned(clonedMachine, tycoon, self.id)
+
 	return true
 end
 
@@ -88,6 +95,20 @@ function Machine:getUpgradeCost()
 	return cost
 end
 
+function Machine:updateLevelAttributes()
+	-- Mettre à jour l'attribut CurrentLevel sur toutes les instances de cette machine
+	for _, tycoon in game.Workspace.Tycoons:GetChildren() do
+		local machines = tycoon:FindFirstChild("Machines")
+		if machines then
+			for _, machine in machines:GetChildren() do
+				if machine:GetAttribute("Id") == self.id then
+					machine:SetAttribute("CurrentLevel", self.currentLevel)
+				end
+			end
+		end
+	end
+end
+
 function Machine:upgrade(player)
 	if not self:canUpgrade() then
 		return false, "Niveau maximum atteint"
@@ -104,6 +125,10 @@ function Machine:upgrade(player)
 	end
 	MoneyService.removeMoney(player, cost)
 	self.currentLevel = self.currentLevel + 1
+
+	-- Mettre à jour l'attribut sur toutes les instances de cette machine dans le monde
+	self:updateLevelAttributes()
+
 	print("Machine améliorée au niveau " .. self.currentLevel)
 	return true, "Machine améliorée au niveau " .. self.currentLevel
 end

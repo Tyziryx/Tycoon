@@ -12,10 +12,12 @@ local PlayerService = require(script.Services.PlayerService)
 local ButtonService = require(script.Services.ButtonService)
 local TycoonService = require(script.Services.TycoonService)
 local PurchasableService = require(script.Services.PurchasableService)
+local ManualBurnerService = require(script.Services.ManualBurnerService)
 
 PlayerService.init()
 TycoonService.init()
 PurchasableService.init()
+ManualBurnerService.init()
 wait(2)
 ButtonService.init()
 
