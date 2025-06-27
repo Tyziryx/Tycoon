@@ -1,5 +1,6 @@
 local Purchasable = require(script.Parent.Purchasable)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TycoonService = require(script.Parent.Parent.Services.TycoonService)
 
 -- Classe Machine hérite de Purchasable
 local Machine = setmetatable({}, { __index = Purchasable })
@@ -59,7 +60,8 @@ function Machine:addToPlayerData(player)
 end
 
 function Machine:getAssetModel()
-	local machines = ReplicatedStorage:WaitForChild("Machines")
+	local tycoon = ReplicatedStorage:WaitForChild("Tycoon")
+	local machines = tycoon:WaitForChild("Machines")
 	for _, machineModel in machines:GetChildren() do
 		if machineModel:GetAttribute("Id") == self.id then
 			return machineModel

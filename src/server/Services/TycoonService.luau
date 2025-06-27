@@ -1,10 +1,12 @@
 local Tycoons = game.Workspace:WaitForChild("Tycoons")
 local TycoonService = {}
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PlaceholderTycoon = ReplicatedStorage:WaitForChild("Tycoon")
 local CollectionService = game:GetService("CollectionService")
 local MoneyService = require(script.Parent.MoneyService)
 local PollutionService = require(script.Parent.PollutionService)
+
+-- Table pour stocker les positions relatives originales des machines
+local originalMachinePositions = {}
 
 -- Créer un événement pour notifier les mises à jour des boutons
 local updateButtonsEvent = Instance.new("BindableEvent")
@@ -12,10 +14,24 @@ updateButtonsEvent.Name = "UpdateButtons"
 updateButtonsEvent.Parent = ReplicatedStorage
 
 function TycoonService.init()
+	-- Sauvegarder les positions relatives des machines originales avant de les supprimer
 	for _, Tycoon in CollectionService:GetTagged("Tycoon") do
 		if Tycoon:IsDescendantOf(ReplicatedStorage) then
 			continue
 		end
+
+		-- Sauvegarder les positions relatives des machines par rapport au tycoon
+		for _, machine in Tycoon.Machines:GetChildren() do
+			local machineId = machine:GetAttribute("Id")
+			if machineId and Tycoon.PrimaryPart then
+				-- Calculer la position relative de la machine par rapport au tycoon
+				local relativeCFrame = Tycoon.PrimaryPart.CFrame:toObjectSpace(machine:GetPivot())
+				originalMachinePositions[machineId] = relativeCFrame
+				print("Position sauvegardée pour machine", machineId, ":", relativeCFrame)
+			end
+		end
+
+		-- Maintenant supprimer les machines
 		Tycoon.Machines:ClearAllChildren()
 	end
 end
@@ -51,29 +67,29 @@ function TycoonService.getTycoon(player)
 	return nil
 end
 
-function TycoonService.getMachineInTycoonById(machineId)
-	if machineId == nil then
-		warn("MachineId is nil")
-		return nil
-	end
-	for _, Machine in PlaceholderTycoon.Machines:GetChildren() do
-		if Machine:GetAttribute("Id") == machineId then
-			return Machine
-		end
-	end
-	warn("Machine not found")
-	return nil
-end
+-- Fonction supprimée car plus nécessaire avec le système de configuration statique
 
 function TycoonService.getRelativeCFrame(machineId)
 	if machineId == nil then
 		warn("MachineId is nil")
-		return nil
+		return CFrame.new(0, 0, 0)
 	end
-	local Machines = TycoonService.getMachineInTycoonById(machineId)
 
-	local RelativeCF = PlaceholderTycoon.PrimaryPart.CFrame:toObjectSpace(Machines:GetPivot())
-	return RelativeCF
+	-- Utiliser la position originale sauvegardée de la machine
+	local originalPosition = originalMachinePositions[machineId]
+	if originalPosition then
+		return originalPosition
+	end
+
+	-- Fallback: positions par défaut si la position originale n'est pas trouvée
+	local defaultPositions = {
+		[1] = CFrame.new(0, 0, 0), -- Premier campfire
+		[2] = CFrame.new(8, 0, 0), -- Deuxième campfire
+		[3] = CFrame.new(16, 0, 0), -- Troisième campfire
+	}
+
+	warn("Position originale non trouvée pour machine ID:", machineId, "- Utilisation position par défaut")
+	return defaultPositions[machineId] or CFrame.new(0, 0, 0)
 end
 
 function TycoonService.getRelativeDecorationCFrame(decorationId)
@@ -140,6 +156,11 @@ function TycoonService.initializeSellPoint(tycoon)
 		MoneyService.addMoney(player, moneyToAdd)
 		updateButtonsEvent:Fire()
 	end)
+end
+
+-- Fonction pour récupérer les positions originales sauvegardées (utile pour debug)
+function TycoonService.getOriginalMachinePositions()
+	return originalMachinePositions
 end
 
 return TycoonService

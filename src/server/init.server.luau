@@ -16,7 +16,6 @@ local PurchasableService = require(script.Services.PurchasableService)
 PlayerService.init()
 TycoonService.init()
 PurchasableService.init()
-wait(2)
 ButtonService.init()
 
 print("Serveur initialisé avec succès!")

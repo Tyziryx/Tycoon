@@ -193,7 +193,7 @@ function ButtonService.showButton(button)
 		end
 	end
 end
-function ButtonService.getButton(machineId)
+function ButtonService.getButtonByTycoon(machineId, tycoon)
 	for _, button in CollectionService:GetTagged("TycoonButton") do
 		if button:GetAttribute("machineId") == machineId then
 			return button
@@ -213,7 +213,9 @@ function ButtonService.showNextButton(parentButton, player)
 	end
 	local machineId = parentButton:GetAttribute("machineId")
 	local requiredButtonId = MachineConfig[machineId].NextButton
-	local childButton = ButtonService.getButton(requiredButtonId)
+	local tycoon = TycoonService.getTycoon(player)
+	local childButton = ButtonService.getButtonByTycoon(requiredButtonId, tycoon)
+	print(childButton)
 	if childButton then
 		ButtonService.showButton(childButton)
 	end

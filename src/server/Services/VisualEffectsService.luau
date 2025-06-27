@@ -3,40 +3,40 @@ local VisualEffectsService = {}
 -- Configuration des effets par type de machine
 local EffectsConfig = {
 	-- Configuration pour les feux de camp
-	CampFire = {
-		-- Effets de particules à rechercher/créer
-		effects = {
-			{
-				type = "Fire",
-				properties = {
-					Size = 5,
-					Heat = 10,
-					Color = Color3.fromRGB(255, 140, 0),
-					SecondaryColor = Color3.fromRGB(255, 69, 0),
-				},
-				levelScaling = {
-					[1] = { Rate = 10 },
-					[2] = { Rate = 100 },
-					[3] = { Rate = 10000 },
-				},
-			},
-			-- Fumée basique sans scaling pour l'instant
-			{
-				type = "Smoke",
-				properties = {
-					Size = NumberSequence.new(3),
-					Opacity = 0.6,
-					RiseVelocity = 5,
-					Color = Color3.fromRGB(50, 50, 50),
-				},
-				levelScaling = {
-					-- Pas de scaling pour l'instant, fumée constante
-				},
-			},
-		},
-		-- Parties où chercher/attacher les effets
-		targetParts = { "FIRE", "Flames", "Center", "PrimaryPart", "FirstBasePart" },
-	},
+	-- CampFire = {
+	-- 	-- Effets de particules à rechercher/créer
+	-- 	effects = {
+	-- 		{
+	-- 			type = "Fire",
+	-- 			properties = {
+	-- 				Size = 5,
+	-- 				Heat = 10,
+	-- 				Color = Color3.fromRGB(255, 140, 0),
+	-- 				SecondaryColor = Color3.fromRGB(255, 69, 0),
+	-- 			},
+	-- 			levelScaling = {
+	-- 				[1] = { Rate = 10 },
+	-- 				[2] = { Rate = 100 },
+	-- 				[3] = { Rate = 10000 },
+	-- 			},
+	-- 		},
+	-- 		-- Fumée basique sans scaling pour l'instant
+	-- 		{
+	-- 			type = "Smoke",
+	-- 			properties = {
+	-- 				Size = NumberSequence.new(3),
+	-- 				Opacity = 0.6,
+	-- 				RiseVelocity = 5,
+	-- 				Color = Color3.fromRGB(50, 50, 50),
+	-- 			},
+	-- 			levelScaling = {
+	-- 				-- Pas de scaling pour l'instant, fumée constante
+	-- 			},
+	-- 		},
+	-- 	},
+	-- 	-- Parties où chercher/attacher les effets
+	-- 	targetParts = { "FIRE", "Flames", "Center", "PrimaryPart", "FirstBasePart" },
+	-- },
 
 	-- Template pour futures machines
 	-- Machine4 = {
