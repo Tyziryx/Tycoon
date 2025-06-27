@@ -195,6 +195,9 @@ function ButtonService.showButton(button)
 end
 function ButtonService.getButtonByTycoon(machineId, tycoon)
 	for _, button in CollectionService:GetTagged("TycoonButton") do
+		if button:IsDescendantOf(ReplicatedStorage) then
+			continue
+		end
 		if button:GetAttribute("machineId") == machineId then
 			return button
 		end

@@ -1,5 +1,5 @@
 local GameConfig = {
-	STARTING_MONEY = 0, -- Plus d'argent pour encourager l'interaction avec les brûleurs
+	STARTING_MONEY = 250000,
 	GENERATION_INTERVAL = 1,
 }
 

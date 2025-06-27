@@ -1,6 +1,5 @@
 local Purchasable = require(script.Parent.Purchasable)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TycoonService = require(script.Parent.Parent.Services.TycoonService)
 
 -- Classe Machine hérite de Purchasable
 local Machine = setmetatable({}, { __index = Purchasable })
