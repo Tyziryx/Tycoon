@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+out/
+include/
+
+# TypeScript
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+
+# Rojo
+*.rbxlx
+*.rbxl
+*.rbxm
+*.rbxmx
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,37 @@
+export const GameConstants = {
+	// Starting values
+	STARTING_MONEY: 0,
+	STARTING_POLLUTION: 0,
+
+	// Game loop
+	GENERATION_INTERVAL: 1,
+	AUTO_SAVE_INTERVAL: 60,
+
+	// Button settings
+	BUTTON_CLICK_COOLDOWN: 0.5,
+	BUTTON_MAX_ACTIVATION_DISTANCE: 32,
+
+	// Economy
+	POLLUTION_CONVERSION_RATE: 10,
+	DEFAULT_UPGRADE_MULTIPLIERS: [1, 1.5, 2, 2.5, 3],
+
+	// Visual
+	COLORS: {
+		BUTTON_RED: Color3.fromRGB(196, 81, 81),
+		BUTTON_GREEN: Color3.fromRGB(42, 221, 42),
+		BUTTON_BLUE: Color3.fromRGB(100, 150, 255),
+		BUTTON_DISABLED: Color3.fromRGB(100, 100, 100),
+	},
+
+	// IDs
+	DECORATION_ID_OFFSET: 1000,
+	ZONE_ID_OFFSET: 10000,
+
+	// Limits
+	MAX_MACHINES_PER_PLAYER: 100,
+	MAX_DECORATIONS_PER_PLAYER: 50,
+} as const;
+
+export const DataStoreKeys = {
+	PLAYER_DATA: "PlayerData_v1",
+} as const;
