@@ -2,21 +2,27 @@ local PurchasableService = {}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+-- Import des configurations
 local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
 local DecorationConfig = require(ReplicatedStorage.Shared.Config.DecorationConfig)
 
+-- Import des classes
 local Machine = require(script.Parent.Parent.Classes.Machine)
 local Decoration = require(script.Parent.Parent.Classes.Decoration)
 
+-- Stockage des instances d'objets achetables
 local purchasableInstances = {}
 
 function PurchasableService.init()
+	-- Créer les instances de machines
 	for id, config in pairs(MachineConfig) do
 		local machine = Machine.new(id, config)
 		purchasableInstances[id] = machine
 	end
 
+	-- Créer les instances de décorations
 	for id, config in pairs(DecorationConfig) do
+		-- Utiliser des IDs différents pour éviter les conflits (ajouter 1000)
 		local decorationId = id + 1000
 		local decoration = Decoration.new(decorationId, config)
 		purchasableInstances[decorationId] = decoration
@@ -93,10 +99,10 @@ function PurchasableService.unlockMachine(player, machineId)
 end
 
 function PurchasableService.unlockDecoration(player, decorationId)
-	local decoration = PurchasableService.getDecoration(decorationId + 1000)
+	local decoration = PurchasableService.getDecoration(decorationId + 1000) -- Ajuster l'ID
 	if not decoration then
-		warn("Decoration introuvable:", decorationId)
-		return false, "Decoration introuvable"
+		warn("Décoration introuvable:", decorationId)
+		return false, "Décoration introuvable"
 	end
 
 	local TycoonService = require(script.Parent.TycoonService)
@@ -174,6 +180,7 @@ function PurchasableService.getAllDecorations()
 	return decorations
 end
 
+-- Fonction de compatibilité avec l'ancien MachineService
 function PurchasableService.getMachineModel(machineId)
 	local machine = PurchasableService.getMachine(machineId)
 	if machine then

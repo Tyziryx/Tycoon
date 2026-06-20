@@ -1,7 +1,7 @@
+local Purchasable = require(script.Parent.Purchasable)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Purchasable = require(script.Parent.Purchasable)
-
+-- Classe Machine hérite de Purchasable
 local Machine = setmetatable({}, { __index = Purchasable })
 Machine.__index = Machine
 
@@ -9,6 +9,7 @@ function Machine.new(id, config)
 	local self = Purchasable.new(id, config, "Machine")
 	setmetatable(self, Machine)
 
+	-- Propriétés spécifiques aux machines
 	self.baseCost = config.BaseCost or 0
 	self.baseIncome = config.BaseIncome or 0
 	self.maxLevel = config.MaxLevel or 1
@@ -55,7 +56,7 @@ end
 function Machine:spawn(tycoon, player)
 	local machineModel = self:getAssetModel()
 	if not machineModel then
-		warn("Modele de machine introuvable pour ID:", self.id)
+		warn("Modèle de machine introuvable pour ID:", self.id)
 		return false
 	end
 
@@ -65,6 +66,7 @@ function Machine:spawn(tycoon, player)
 		currentLevel = 1
 	end
 
+	-- Obtenir la position relative depuis TycoonService
 	local TycoonService = require(script.Parent.Parent.Services.TycoonService)
 	local relativeCF = TycoonService.getRelativeCFrame(self.id)
 	local worldCF = tycoon.PrimaryPart.CFrame:toWorldSpace(relativeCF)
@@ -83,10 +85,12 @@ function Machine:spawn(tycoon, player)
 	clonedMachine:SetAttribute("CurrentLevel", currentLevel)
 	clonedMachine:SetAttribute("IsBuilding", true)
 
+	-- Configurer les effets visuels
 	local VisualEffectsService = require(script.Parent.Parent.Services.VisualEffectsService)
 	VisualEffectsService.setupMachineEffects(clonedMachine, self.name, currentLevel)
 	VisualEffectsService.playBuildAnimation(clonedMachine, self.config.BuildTime or 0)
 
+	-- Configurer le brûleur manuel si c'est un feu de camp
 	local ManualBurnerService = require(script.Parent.Parent.Services.ManualBurnerService)
 	ManualBurnerService.onMachineSpawned(clonedMachine, tycoon, self.id)
 
@@ -131,7 +135,6 @@ function Machine:getAssetModel()
 			return machineModel
 		end
 	end
-
 	return nil
 end
 
@@ -140,12 +143,13 @@ function Machine:generateIncome(level)
 		return 0
 	end
 
+	-- Pollution générée par seconde = revenu de base × multiplicateur du tier courant.
+	-- Le niveau 1 n'a pas de tier dans la config => multiplicateur ×1.
 	local multiplier = 1
 	local tier = self.upgrades[level]
 	if tier and tier.Multiplier then
 		multiplier = tier.Multiplier
 	end
-
 	return self.baseIncome * multiplier
 end
 
@@ -164,7 +168,6 @@ function Machine:getUpgradeCost(player)
 	if nextTier and nextTier.Cost then
 		return nextTier.Cost
 	end
-
 	return nil
 end
 
@@ -196,7 +199,7 @@ function Machine:upgrade(player)
 
 	local cost = self:getUpgradeCost(player)
 	if not cost then
-		return false, "Cout d'amelioration non defini"
+		return false, "Coût d'amélioration non défini"
 	end
 
 	local machineData = getMachineData(player, self.id)
@@ -206,9 +209,8 @@ function Machine:upgrade(player)
 
 	local MoneyService = require(script.Parent.Parent.Services.MoneyService)
 	if not MoneyService.canAfford(player, cost) then
-		return false, "Pas assez d'argent pour ameliorer"
+		return false, "Pas assez d'argent pour améliorer"
 	end
-
 	MoneyService.removeMoney(player, cost)
 
 	local level = machineData:FindFirstChild("Level")
