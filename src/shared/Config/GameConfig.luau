@@ -2,6 +2,11 @@ local GameConfig = {
 	STARTING_MONEY = 0,
 	GENERATION_INTERVAL = 1,
 	POLLUTION_TO_MONEY_RATE = 1,
+	REBIRTH = {
+		MIN_RUN_POLLUTION = 1000,
+		ASH_BASE = 1,
+		ASH_GROWTH = 4,
+	},
 }
 
 return GameConfig
