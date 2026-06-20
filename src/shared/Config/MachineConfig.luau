@@ -1,34 +1,68 @@
+-- Configuration des machines (source de vérité : docs/DESIGN.md, Zone 1).
+--
+-- Chaque machine est entièrement pilotée par les données :
+--   BaseCost     : coût d'achat (niveau 1)
+--   BaseIncome   : pollution générée par seconde au niveau 1
+--   MaxLevel     : nombre de tiers (niveaux)
+--   NextButton   : machineId du bouton à révéler après l'achat (chaîne d'achats)
+--   Upgrades     : { [niveau] = { Cost = coût pour atteindre ce niveau,
+--                                 Multiplier = multiplicateur de rendement } }
+--
+-- Pour ajouter une machine, voir docs/DESIGN.md ("Ajouter une nouvelle machine").
+
 local MachineConfig = {
 	[1] = {
 		Name = "CampFire",
 		BaseCost = 0,
-		BaseIncome = 10,
-		NextButton = 2,
+		BaseIncome = 1,
 		ZoneRequired = 1,
+		NextButton = 2,
 		MaxLevel = 3,
+		Upgrades = {
+			[2] = { Cost = 100, Multiplier = 1.5 },
+			[3] = { Cost = 200, Multiplier = 2 },
+		},
 	},
 	[2] = {
 		Name = "CampFire",
-		NextButton = 3,
 		BaseCost = 30,
-		BaseIncome = 10,
+		BaseIncome = 1,
 		ZoneRequired = 1,
+		NextButton = 3,
 		MaxLevel = 3,
+		Upgrades = {
+			[2] = { Cost = 150, Multiplier = 1.5 },
+			[3] = { Cost = 300, Multiplier = 2 },
+		},
 	},
 	[3] = {
 		Name = "CampFire",
 		BaseCost = 60,
-		BaseIncome = 10,
-		ZoneRequired = 1,
-		MaxLevel = 3,
-	},
-	["Machine4"] = {
-		Name = "Machine4",
-		BaseCost = 100,
 		BaseIncome = 1,
-		ZoneRequired = 2,
+		ZoneRequired = 1,
+		-- Pas de NextButton : dernière machine de la Zone 1
 		MaxLevel = 3,
+		Upgrades = {
+			[2] = { Cost = 300, Multiplier = 1.5 },
+			[3] = { Cost = 600, Multiplier = 2 },
+		},
 	},
+
+	-- ┌──────────────────────────────────────────────────────────────────┐
+	-- │ MODÈLE pour une future machine (Zone 2, etc.). Décommenter +       │
+	-- │ placer le modèle + le bouton correspondants dans Studio.           │
+	-- └──────────────────────────────────────────────────────────────────┘
+	-- [4] = {
+	-- 	Name = "Usine",
+	-- 	BaseCost = 1000,
+	-- 	BaseIncome = 5,
+	-- 	ZoneRequired = 2,
+	-- 	MaxLevel = 3,
+	-- 	Upgrades = {
+	-- 		[2] = { Cost = 2000, Multiplier = 1.5 },
+	-- 		[3] = { Cost = 4000, Multiplier = 2 },
+	-- 	},
+	-- },
 }
 
 return MachineConfig

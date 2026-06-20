@@ -23,6 +23,15 @@ function PollutionService.setupLeaderstats(player)
 	end
 	pollution.Parent = leaderstats
 
+	-- Compteur de pollution TOTALE (à vie) : c'est le score "plus gros pollueur".
+	-- Contrairement à "Pollution", il ne redescend jamais (la vente ne l'affecte pas).
+	local totalPollution = Instance.new("IntValue")
+	totalPollution.Name = "Pollution Totale"
+	local statsFolder = player.Data:FindFirstChild("Stats")
+	local totalData = statsFolder and statsFolder:FindFirstChild("TotalPollution")
+	totalPollution.Value = totalData and totalData.Value or 0
+	totalPollution.Parent = leaderstats
+
 	return pollution
 end
 
@@ -38,6 +47,17 @@ function PollutionService.addPollution(player, amount)
 		-- Update leaderstats
 		if player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Pollution") then
 			player.leaderstats.Pollution.Value = pollutionValue.Value
+		end
+
+		-- Incrémenter la pollution TOTALE (à vie). Elle ne redescend jamais,
+		-- même après une vente à la Mafia : c'est le score du classement.
+		local statsFolder = player.Data:FindFirstChild("Stats")
+		local totalData = statsFolder and statsFolder:FindFirstChild("TotalPollution")
+		if totalData then
+			totalData.Value = totalData.Value + amount
+			if player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Pollution Totale") then
+				player.leaderstats["Pollution Totale"].Value = totalData.Value
+			end
 		end
 	end
 end

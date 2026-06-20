@@ -14,8 +14,8 @@ function Machine.new(id, config)
 	self.baseIncome = config.BaseIncome or 0
 	self.maxLevel = config.MaxLevel or 1
 	self.currentLevel = 1
-	self.upgradeCost = config.BaseCost * (self.currentLevel - 1) * 5
-	self.upgradeIncome = 0
+	-- Tiers d'amélioration : { [niveau] = { Cost = ..., Multiplier = ... } }
+	self.upgrades = config.Upgrades or {}
 
 	return self
 end
@@ -74,13 +74,14 @@ function Machine:generateIncome()
 		return 0
 	end
 
-	local baseIncome = self.baseIncome
-	if self.currentLevel == 2 then
-		baseIncome *= 1.5
-	elseif self.currentLevel == 3 then
-		baseIncome *= 2
+	-- Pollution générée par seconde = revenu de base × multiplicateur du tier courant.
+	-- Le niveau 1 n'a pas de tier dans la config => multiplicateur ×1.
+	local multiplier = 1
+	local tier = self.upgrades[self.currentLevel]
+	if tier and tier.Multiplier then
+		multiplier = tier.Multiplier
 	end
-	return baseIncome
+	return self.baseIncome * multiplier
 end
 
 function Machine:canUpgrade()
@@ -91,13 +92,12 @@ function Machine:getUpgradeCost()
 	if not self:canUpgrade() then
 		return nil
 	end
-	local cost = self.baseCost * self.currentLevel * 5
-	if self.id == 1 and self.currentLevel == 1 then
-		cost = 100
-	elseif self.id == 1 and self.currentLevel == 2 then
-		cost = 200
+	-- Le coût provient du tier suivant défini dans MachineConfig.
+	local nextTier = self.upgrades[self.currentLevel + 1]
+	if nextTier and nextTier.Cost then
+		return nextTier.Cost
 	end
-	return cost
+	return nil
 end
 
 function Machine:updateLevelAttributes()

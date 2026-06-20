@@ -5,6 +5,7 @@ local DefaultPlayerData = {
 	OwnedMachines = {},
 	Stats = {
 		TotalMoneyEarned = 0,
+		TotalPollution = 0,
 		PlayTime = 0,
 	},
 }
