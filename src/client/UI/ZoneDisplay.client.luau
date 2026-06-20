@@ -12,20 +12,27 @@ local currentZone = dataFolder:WaitForChild("CurrentZone")
 local runPollution = statsFolder:WaitForChild("RunPollution")
 local zoneReachedRemote = ReplicatedStorage:WaitForChild("ZoneReached")
 
+local DEFAULT_TOP_OFFSET = 18
+local HUD_GAP = 8
+local ZONE_DISPLAY_ORDER = 50
+
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ZoneProgressGui"
 screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true
+screenGui.DisplayOrder = ZONE_DISPLAY_ORDER
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.Parent = playerGui
 
 local container = Instance.new("Frame")
 container.Name = "ZoneProgress"
 container.AnchorPoint = Vector2.new(0.5, 0)
-container.Position = UDim2.new(0.5, 0, 0, 18)
+container.Position = UDim2.new(0.5, 0, 0, DEFAULT_TOP_OFFSET)
 container.Size = UDim2.fromOffset(320, 48)
 container.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 container.BackgroundTransparency = 0.18
 container.BorderSizePixel = 0
+container.ZIndex = 20
 container.Parent = screenGui
 
 local sizeConstraint = Instance.new("UISizeConstraint")
@@ -42,6 +49,7 @@ zoneLabel.Font = Enum.Font.GothamBold
 zoneLabel.TextColor3 = Color3.fromRGB(245, 245, 245)
 zoneLabel.TextSize = 14
 zoneLabel.TextXAlignment = Enum.TextXAlignment.Left
+zoneLabel.ZIndex = 21
 zoneLabel.Parent = container
 
 local progressBackground = Instance.new("Frame")
@@ -50,6 +58,7 @@ progressBackground.Position = UDim2.fromOffset(12, 27)
 progressBackground.Size = UDim2.new(1, -24, 0, 10)
 progressBackground.BackgroundColor3 = Color3.fromRGB(54, 54, 54)
 progressBackground.BorderSizePixel = 0
+progressBackground.ZIndex = 21
 progressBackground.Parent = container
 
 local progressFill = Instance.new("Frame")
@@ -57,6 +66,7 @@ progressFill.Name = "ProgressFill"
 progressFill.Size = UDim2.fromScale(0, 1)
 progressFill.BackgroundColor3 = Color3.fromRGB(198, 121, 48)
 progressFill.BorderSizePixel = 0
+progressFill.ZIndex = 22
 progressFill.Parent = progressBackground
 
 local progressText = Instance.new("TextLabel")
@@ -68,6 +78,7 @@ progressText.Font = Enum.Font.Gotham
 progressText.TextColor3 = Color3.fromRGB(225, 225, 225)
 progressText.TextSize = 10
 progressText.TextXAlignment = Enum.TextXAlignment.Right
+progressText.ZIndex = 21
 progressText.Parent = container
 
 local banner = Instance.new("TextLabel")
@@ -84,7 +95,51 @@ banner.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 banner.TextStrokeTransparency = 1
 banner.TextTransparency = 1
 banner.TextSize = 34
+banner.ZIndex = 30
 banner.Parent = screenGui
+
+local function getHudHeader()
+	local existingHud = playerGui:FindFirstChild("ScreenGUI")
+	if not existingHud then
+		return nil
+	end
+
+	local header = existingHud:FindFirstChild("Header")
+	if header and header:IsA("GuiObject") then
+		return header
+	end
+
+	return nil
+end
+
+local function updateContainerPosition()
+	local header = getHudHeader()
+	local topOffset = DEFAULT_TOP_OFFSET
+
+	if header then
+		topOffset = header.AbsolutePosition.Y + header.AbsoluteSize.Y + HUD_GAP
+	end
+
+	container.Position = UDim2.new(0.5, 0, 0, topOffset)
+end
+
+local function bindToHudHeader()
+	local existingHud = playerGui:FindFirstChild("ScreenGUI") or playerGui:WaitForChild("ScreenGUI", 5)
+	if not existingHud then
+		updateContainerPosition()
+		return
+	end
+
+	local header = existingHud:FindFirstChild("Header") or existingHud:WaitForChild("Header", 5)
+	if not header or not header:IsA("GuiObject") then
+		updateContainerPosition()
+		return
+	end
+
+	updateContainerPosition()
+	header:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateContainerPosition)
+	header:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateContainerPosition)
+end
 
 local function formatNumber(amount)
 	if amount >= 1000000 then
@@ -150,4 +205,5 @@ zoneReachedRemote.OnClientEvent:Connect(function(zoneId)
 	showZoneBanner(zoneId)
 end)
 
+task.spawn(bindToHudHeader)
 updateProgress()
