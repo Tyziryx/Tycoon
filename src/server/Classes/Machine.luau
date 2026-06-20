@@ -39,10 +39,12 @@ function Machine:spawn(tycoon)
 
 	-- Sauvegarder le niveau en attribut pour accès externe
 	clonedMachine:SetAttribute("CurrentLevel", self.currentLevel)
+	clonedMachine:SetAttribute("IsBuilding", true)
 
 	-- Configurer les effets visuels
 	local VisualEffectsService = require(script.Parent.Parent.Services.VisualEffectsService)
 	VisualEffectsService.setupMachineEffects(clonedMachine, self.name, self.currentLevel)
+	VisualEffectsService.playBuildAnimation(clonedMachine, self.config.BuildTime or 0)
 
 	-- Configurer le brûleur manuel si c'est un feu de camp
 	local ManualBurnerService = require(script.Parent.Parent.Services.ManualBurnerService)
