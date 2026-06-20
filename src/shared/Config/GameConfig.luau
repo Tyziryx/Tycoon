@@ -1,5 +1,7 @@
 local GameConfig = {
-	STARTING_MONEY = 0,
+	-- Valeur de debug nécessaire pour tester la progression complète sans grind.
+	-- Ne pas l'enlever tant que l'équilibrage final n'est pas prêt.
+	STARTING_MONEY = 250000,
 	GENERATION_INTERVAL = 1,
 	POLLUTION_TO_MONEY_RATE = 1,
 	REBIRTH = {
