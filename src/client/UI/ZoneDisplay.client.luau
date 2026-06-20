@@ -13,7 +13,7 @@ local runPollution = statsFolder:WaitForChild("RunPollution")
 local zoneReachedRemote = ReplicatedStorage:WaitForChild("ZoneReached")
 
 local DEFAULT_TOP_OFFSET = 18
-local HUD_GAP = 8
+local HUD_GAP = 12
 local ZONE_DISPLAY_ORDER = 50
 
 local screenGui = Instance.new("ScreenGui")
@@ -112,15 +112,34 @@ local function getHudHeader()
 	return nil
 end
 
+local function getGuiObjectBottom(guiObject)
+	local bottom = guiObject.AbsolutePosition.Y + guiObject.AbsoluteSize.Y
+
+	for _, descendant in guiObject:GetDescendants() do
+		if descendant:IsA("GuiObject") and descendant.Visible then
+			local descendantBottom = descendant.AbsolutePosition.Y + descendant.AbsoluteSize.Y
+			bottom = math.max(bottom, descendantBottom)
+		end
+	end
+
+	return bottom
+end
+
 local function updateContainerPosition()
 	local header = getHudHeader()
 	local topOffset = DEFAULT_TOP_OFFSET
 
 	if header then
-		topOffset = header.AbsolutePosition.Y + header.AbsoluteSize.Y + HUD_GAP
+		topOffset = math.max(topOffset, getGuiObjectBottom(header) + HUD_GAP)
 	end
 
 	container.Position = UDim2.new(0.5, 0, 0, topOffset)
+end
+
+local function bindGuiObjectBounds(guiObject)
+	guiObject:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateContainerPosition)
+	guiObject:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateContainerPosition)
+	guiObject:GetPropertyChangedSignal("Visible"):Connect(updateContainerPosition)
 end
 
 local function bindToHudHeader()
@@ -137,8 +156,23 @@ local function bindToHudHeader()
 	end
 
 	updateContainerPosition()
-	header:GetPropertyChangedSignal("AbsolutePosition"):Connect(updateContainerPosition)
-	header:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateContainerPosition)
+	bindGuiObjectBounds(header)
+
+	for _, descendant in header:GetDescendants() do
+		if descendant:IsA("GuiObject") then
+			bindGuiObjectBounds(descendant)
+		end
+	end
+
+	header.DescendantAdded:Connect(function(descendant)
+		if descendant:IsA("GuiObject") then
+			bindGuiObjectBounds(descendant)
+			updateContainerPosition()
+		end
+	end)
+
+	header.DescendantRemoving:Connect(updateContainerPosition)
+	task.defer(updateContainerPosition)
 end
 
 local function formatNumber(amount)
