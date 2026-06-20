@@ -203,9 +203,9 @@ niveaux à coût **géométrique** (ex. ×1.5 par niveau).
 
 ## TODO / idées futures
 
-- [ ] **Bug multijoueur** : les instances `Machine` sont des singletons partagés
+- [x] **Bug multijoueur** : les instances `Machine` sont des singletons partagés
       (`PurchasableService.init`) → `isUnlocked`/`currentLevel` sont communs à tous les
-      joueurs. À rendre par-joueur avant tout test à +1 joueur.
+      joueurs. Corrigé via des instances logiques par joueur dans `PurchasableService`.
 - [ ] **Persistance** (`DataStore`) + **gains hors-ligne**.
 - [ ] **Classement global** via `OrderedDataStore`.
 - [ ] **Rééquilibrage** : `STARTING_MONEY = 250000` est une valeur de debug.

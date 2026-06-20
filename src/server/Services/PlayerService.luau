@@ -6,6 +6,7 @@ local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
 
 local MoneyService = require(script.Parent.MoneyService)
 local PollutionService = require(script.Parent.PollutionService)
+local PurchasableService = require(script.Parent.PurchasableService)
 local DefaultPlayerData = require(ReplicatedStorage.Shared.Config.PlayerData)
 local TyconnService = require(script.Parent.TycoonService)
 
@@ -72,6 +73,9 @@ end
 
 function PlayerService.init()
 	Players.PlayerAdded:Connect(PlayerService.onPlayerAdded)
+	Players.PlayerRemoving:Connect(function(player)
+		PurchasableService.clearPlayer(player)
+	end)
 end
 
 function PlayerService.updatePlayer()

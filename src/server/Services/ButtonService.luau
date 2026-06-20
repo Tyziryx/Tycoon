@@ -202,7 +202,7 @@ function ButtonService.startBuildState(button, player, info)
 		end
 
 		if info.itemType == "Machine" then
-			ButtonService.convertToUpgradeButton(button, info.targetId)
+			ButtonService.convertToUpgradeButton(button, info.targetId, player)
 			ButtonService.showNextButton(button, player)
 		else
 			button:SetAttribute("Unlocked", true)
@@ -246,7 +246,7 @@ function ButtonService.updateButton()
 
 		local isUpgradeButton = button:GetAttribute("IsUpgradeButton")
 		if isUpgradeButton and info.itemType == "Machine" then
-			local machine = PurchasableService.getMachine(info.targetId)
+			local machine = PurchasableService.getPlayerMachine(player, info.targetId)
 			if machine and machine:canUpgrade() then
 				local upgradeCost = machine:getUpgradeCost()
 				button.Color = MoneyService.canAfford(player, upgradeCost) and blueButton or redButton
@@ -339,14 +339,14 @@ function ButtonService.showNextButton(parentButton, player)
 	end)
 end
 
-function ButtonService.convertToUpgradeButton(button, machineId)
+function ButtonService.convertToUpgradeButton(button, machineId, player)
 	button.Color = redButton
-	ButtonService.updateUpgradeButtonText(button, machineId)
+	ButtonService.updateUpgradeButtonText(button, machineId, player)
 	button:SetAttribute("IsUpgradeButton", true)
 end
 
-function ButtonService.updateUpgradeButtonText(button, machineId)
-	local machine = PurchasableService.getMachine(machineId)
+function ButtonService.updateUpgradeButtonText(button, machineId, player)
+	local machine = PurchasableService.getPlayerMachine(player, machineId)
 	local machineConfig = MachineConfig[machineId]
 	if not machine or not machineConfig then
 		return
@@ -362,7 +362,7 @@ function ButtonService.updateUpgradeButtonText(button, machineId)
 end
 
 function ButtonService.handleUpgrade(button, player, machineId)
-	local machine = PurchasableService.getMachine(machineId)
+	local machine = PurchasableService.getPlayerMachine(player, machineId)
 	if not machine or not machine:canUpgrade() then
 		playButtonSound(button, "Denied")
 		return
@@ -387,7 +387,7 @@ function ButtonService.handleUpgrade(button, player, machineId)
 		return
 	end
 
-	ButtonService.updateUpgradeButtonText(button, machineId)
+	ButtonService.updateUpgradeButtonText(button, machineId, player)
 end
 
 function ButtonService.playerOwnsItem(player, itemType, itemId)
