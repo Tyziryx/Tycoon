@@ -15,3 +15,13 @@ rojo serve
 ```
 
 For more help, check out [the Rojo documentation](https://rojo.space/docs).
+
+## Travail en équipe : code vs scène 3D
+
+- **Code** → `src/`, versionné dans git et synchronisé par Rojo.
+- **Scène 3D** (Workspace, Lighting, assets) → un fichier place ne se merge pas
+  dans git. Collaboration 3D en temps réel via **Team Create** sur le place
+  cloud partagé ; le repo garde un **snapshot** dans [`place/`](place/README.md)
+  comme sauvegarde et base d'onboarding (voir le README de ce dossier).
+- Le `Tycoon.rbxlx` à la racine est l'artefact de `rojo build` (scripts seuls)
+  et reste gitignoré.

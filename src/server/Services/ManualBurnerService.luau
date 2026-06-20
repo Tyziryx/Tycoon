@@ -69,12 +69,12 @@ end
 
 function ManualBurnerService.createFloatingText(campfire, text)
 	local billboardGui = Instance.new("BillboardGui")
-	billboardGui.Size = UDim2.new(0, 200, 0, 50)
+	billboardGui.Size = UDim2.fromOffset(200, 50)
 	billboardGui.StudsOffset = Vector3.new(0, 3, 0)
 	billboardGui.Parent = campfire
 
 	local textLabel = Instance.new("TextLabel")
-	textLabel.Size = UDim2.new(1, 0, 1, 0)
+	textLabel.Size = UDim2.fromScale(1, 1)
 	textLabel.BackgroundTransparency = 1
 	textLabel.Text = text
 	textLabel.TextColor3 = Color3.fromRGB(255, 255, 0)

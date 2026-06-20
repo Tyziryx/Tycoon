@@ -133,7 +133,7 @@ function PurchasableService.calculateTotalIncome(player)
 
 		local machine = PurchasableService.getMachine(machineId)
 		if machine then
-			totalIncome += machine:generateIncome(level)
+			totalIncome = totalIncome + machine:generateIncome(level)
 		end
 	end
 

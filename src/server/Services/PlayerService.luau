@@ -7,9 +7,43 @@ local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
 local MoneyService = require(script.Parent.MoneyService)
 local PollutionService = require(script.Parent.PollutionService)
 local DefaultPlayerData = require(ReplicatedStorage.Shared.Config.PlayerData)
-local TyconnService = require(script.Parent.TycoonService)
+local TycoonService = require(script.Parent.TycoonService)
+local ZoneService = require(script.Parent.ZoneService)
+local RebirthService = require(script.Parent.RebirthService)
 
 local PlayerService = {}
+
+local function createValueObject(name, value, parent)
+	local valueObject
+	if type(value) == "number" then
+		valueObject = Instance.new("NumberValue")
+	elseif type(value) == "string" then
+		valueObject = Instance.new("StringValue")
+	elseif type(value) == "boolean" then
+		valueObject = Instance.new("BoolValue")
+	else
+		valueObject = Instance.new("StringValue")
+		value = tostring(value)
+	end
+
+	valueObject.Name = tostring(name)
+	valueObject.Value = value
+	valueObject.Parent = parent
+	return valueObject
+end
+
+local function populateDataFolder(parent, data)
+	for key, value in pairs(data) do
+		if type(value) == "table" then
+			local subFolder = Instance.new("Folder")
+			subFolder.Name = tostring(key)
+			subFolder.Parent = parent
+			populateDataFolder(subFolder, value)
+		else
+			createValueObject(key, value, parent)
+		end
+	end
+end
 
 function PlayerService.onPlayerAdded(player)
 	if player == nil then
@@ -20,45 +54,7 @@ function PlayerService.onPlayerAdded(player)
 	dataFolder.Name = "Data"
 	dataFolder.Parent = player
 
-	for key, value in pairs(DefaultPlayerData) do
-		if type(value) == "table" then
-			local subFolder = Instance.new("Folder")
-			subFolder.Name = key
-			subFolder.Parent = dataFolder
-
-			for subKey, subValue in pairs(value) do
-				local valueObject
-				if type(subValue) == "number" then
-					valueObject = Instance.new("NumberValue")
-				elseif type(subValue) == "string" then
-					valueObject = Instance.new("StringValue")
-				elseif type(subValue) == "boolean" then
-					valueObject = Instance.new("BoolValue")
-				else
-					valueObject = Instance.new("StringValue")
-					subValue = tostring(subValue)
-				end
-				valueObject.Name = subKey
-				valueObject.Value = subValue
-				valueObject.Parent = subFolder
-			end
-		else
-			local valueObject
-			if type(value) == "number" then
-				valueObject = Instance.new("NumberValue")
-			elseif type(value) == "string" then
-				valueObject = Instance.new("StringValue")
-			elseif type(value) == "boolean" then
-				valueObject = Instance.new("BoolValue")
-			else
-				valueObject = Instance.new("StringValue")
-				value = tostring(value)
-			end
-			valueObject.Name = key
-			valueObject.Value = value
-			valueObject.Parent = dataFolder
-		end
-	end
+	populateDataFolder(dataFolder, DefaultPlayerData)
 
 	local moneyValue = dataFolder:FindFirstChild("Money")
 	if moneyValue then
@@ -67,7 +63,9 @@ function PlayerService.onPlayerAdded(player)
 
 	MoneyService.setupLeaderstats(player)
 	PollutionService.setupLeaderstats(player)
-	TyconnService.assignTycoon(player)
+	RebirthService.setupLeaderstats(player)
+	ZoneService.setupPlayer(player)
+	TycoonService.assignTycoon(player)
 end
 
 function PlayerService.init()

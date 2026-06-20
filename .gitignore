@@ -1,6 +1,8 @@
-# Project place file
+# Build artifact produced by `rojo build` (scripts only — do NOT version)
 /Tycoon.rbxlx
 
-# Roblox Studio lock files
-/*.rbxlx.lock
-/*.rbxl.lock
+# Roblox Studio lock files (anywhere, incl. place/)
+*.rbxlx.lock
+*.rbxl.lock
+
+# NOTE: the versioned 3D scene snapshot lives in place/ and is tracked.

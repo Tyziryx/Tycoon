@@ -1,4 +1,5 @@
 local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
@@ -68,6 +69,16 @@ local function getTycoonForButton(button)
 	end
 
 	return nil
+end
+
+local function getPlayerForButton(button)
+	local tycoon = getTycoonForButton(button)
+	local playerId = tycoon and tycoon:GetAttribute("UserId")
+	if type(playerId) ~= "number" then
+		return nil
+	end
+
+	return Players:GetPlayerByUserId(playerId)
 end
 
 local function getCostGuiEnabled(button)
@@ -202,6 +213,11 @@ function ButtonService.startBuildState(button, player, info)
 		end
 
 		if info.itemType == "Machine" then
+			if not ButtonService.playerOwnsItem(player, info.itemType, info.targetId) then
+				button:SetAttribute("TempDisabled", false)
+				return
+			end
+
 			ButtonService.convertToUpgradeButton(button, info.targetId, player)
 			ButtonService.showNextButton(button, player)
 		else
@@ -246,10 +262,12 @@ function ButtonService.updateButton()
 
 		local isUpgradeButton = button:GetAttribute("IsUpgradeButton")
 		if isUpgradeButton and info.itemType == "Machine" then
-			local machine = PurchasableService.getPlayerMachine(player, info.targetId)
-			if machine and machine:canUpgrade() then
-				local upgradeCost = machine:getUpgradeCost()
-				button.Color = MoneyService.canAfford(player, upgradeCost) and blueButton or redButton
+			local machine = PurchasableService.getMachine(info.targetId)
+			if machine and machine:canUpgrade(player) then
+				local upgradeCost = machine:getUpgradeCost(player)
+				if upgradeCost then
+					button.Color = MoneyService.canAfford(player, upgradeCost) and blueButton or redButton
+				end
 			end
 		else
 			button.Color = MoneyService.canAfford(player, info.config.BaseCost) and greenButton or redButton
@@ -333,6 +351,10 @@ function ButtonService.showNextButton(parentButton, player)
 	local nextConfig = MachineConfig[machineConfig.NextButton]
 	local unlockDelay = nextConfig and nextConfig.UnlockDelay or 0
 	task.delay(unlockDelay, function()
+		if not ButtonService.playerOwnsMachine(player, machineId) then
+			return
+		end
+
 		if childButton.Parent then
 			ButtonService.showButton(childButton)
 		end
@@ -346,15 +368,20 @@ function ButtonService.convertToUpgradeButton(button, machineId, player)
 end
 
 function ButtonService.updateUpgradeButtonText(button, machineId, player)
-	local machine = PurchasableService.getPlayerMachine(player, machineId)
+	local machine = PurchasableService.getMachine(machineId)
 	local machineConfig = MachineConfig[machineId]
 	if not machine or not machineConfig then
 		return
 	end
 
-	if machine:canUpgrade() then
-		local upgradeCost = machine:getUpgradeCost()
-		local nextLevel = machine.currentLevel + 1
+	player = player or getPlayerForButton(button)
+	if not player then
+		return
+	end
+
+	if machine:canUpgrade(player) then
+		local upgradeCost = machine:getUpgradeCost(player)
+		local nextLevel = machine:getLevel(player) + 1
 		setButtonText(button, "Upgrade " .. machineConfig.Name .. " Lvl." .. nextLevel .. " - " .. upgradeCost .. "$")
 	else
 		setButtonText(button, machineConfig.Name .. " Max")
@@ -362,13 +389,13 @@ function ButtonService.updateUpgradeButtonText(button, machineId, player)
 end
 
 function ButtonService.handleUpgrade(button, player, machineId)
-	local machine = PurchasableService.getPlayerMachine(player, machineId)
-	if not machine or not machine:canUpgrade() then
+	local machine = PurchasableService.getMachine(machineId)
+	if not machine or not machine:canUpgrade(player) then
 		playButtonSound(button, "Denied")
 		return
 	end
 
-	local upgradeCost = machine:getUpgradeCost()
+	local upgradeCost = machine:getUpgradeCost(player)
 	if not upgradeCost or not MoneyService.canAfford(player, upgradeCost) then
 		playButtonSound(button, "Denied")
 		return
@@ -382,8 +409,9 @@ function ButtonService.handleUpgrade(button, player, machineId)
 
 	playButtonSound(button, "Purchase")
 
-	if machine.currentLevel >= machine.maxLevel then
-		button:Destroy()
+	if machine:getLevel(player) >= machine.maxLevel then
+		button:SetAttribute("Maxed", true)
+		ButtonService.hideButton(button)
 		return
 	end
 
@@ -391,6 +419,10 @@ function ButtonService.handleUpgrade(button, player, machineId)
 end
 
 function ButtonService.playerOwnsItem(player, itemType, itemId)
+	if itemType == "Machine" then
+		return PurchasableService.playerOwnsMachine(player, itemId)
+	end
+
 	local folderName = itemType == "Decoration" and "OwnedDecorations" or "OwnedMachines"
 	local ownedItems = player.Data:FindFirstChild(folderName)
 	if not ownedItems then
@@ -408,6 +440,43 @@ end
 
 function ButtonService.playerOwnsMachine(player, machineId)
 	return ButtonService.playerOwnsItem(player, "Machine", machineId)
+end
+
+function ButtonService.resetMachineButtonsForPlayer(player)
+	local tycoon = TycoonService.getTycoon(player)
+	if not tycoon then
+		return
+	end
+
+	for _, button in CollectionService:GetTagged("TycoonButton") do
+		if not button:IsDescendantOf(tycoon) then
+			continue
+		end
+
+		local buttonId = button:GetAttribute("machineId")
+		if type(buttonId) ~= "number" or buttonId >= 1000 then
+			continue
+		end
+
+		local machineConfig = MachineConfig[buttonId]
+		if not machineConfig then
+			continue
+		end
+
+		button:SetAttribute("TempDisabled", false)
+		button:SetAttribute("Unlocked", false)
+		button:SetAttribute("IsUpgradeButton", false)
+		button:SetAttribute("Maxed", false)
+		setButtonText(button, machineConfig.Name .. " " .. machineConfig.BaseCost .. " $")
+
+		if buttonId == 1 then
+			ButtonService.showButton(button)
+		else
+			ButtonService.hideButton(button)
+		end
+	end
+
+	ButtonService.updateButton()
 end
 
 return ButtonService
