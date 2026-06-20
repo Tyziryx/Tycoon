@@ -1,8 +1,8 @@
--- Configuration des machines (source de vérité : docs/DESIGN.md, Zone 1).
+-- Configuration des machines (source de vérité : docs/DESIGN.md, Palier 1).
 --
 -- Chaque machine est entièrement pilotée par les données.
 --
--- Économie (cf. docs/DESIGN.md, table « Machines — Zone 1 ») :
+-- Économie (cf. docs/DESIGN.md, table « Machines — Palier 1 ») :
 --   BaseCost     : coût d'achat (niveau 1)
 --   BaseIncome   : pollution générée par seconde au niveau 1
 --   MaxLevel     : nombre de tiers (niveaux)
@@ -56,7 +56,7 @@ local MachineConfig = {
 		BaseCost = 60,
 		BaseIncome = 1,
 		ZoneRequired = 1,
-		-- Pas de NextButton : dernière machine de la Zone 1
+		-- Pas de NextButton : dernière machine du Palier 1 actuellement versionnée
 		MaxLevel = 3,
 		BuildTime = 6,
 		UnlockDelay = 20,
@@ -69,7 +69,7 @@ local MachineConfig = {
 	},
 
 	-- ┌──────────────────────────────────────────────────────────────────┐
-	-- │ MODÈLE pour une future machine (Zone 2, etc.). Décommenter +       │
+	-- │ MODÈLE pour une future machine (Palier 2, etc.). Décommenter +     │
 	-- │ placer le modèle + le bouton correspondants dans Studio.           │
 	-- └──────────────────────────────────────────────────────────────────┘
 	-- [4] = {

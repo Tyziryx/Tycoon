@@ -100,7 +100,7 @@ local function updateProgress()
 	local zoneData = ZoneConfig[zoneId]
 	local nextZoneData = ZoneConfig[zoneId + 1]
 
-	zoneLabel.Text = "ZONE " .. zoneId .. " - " .. (zoneData and zoneData.Name or "")
+	zoneLabel.Text = "PALIER " .. zoneId .. " - " .. (zoneData and zoneData.Name or "")
 
 	if not nextZoneData then
 		progressFill.Size = UDim2.fromScale(1, 1)
@@ -124,7 +124,7 @@ local function updateProgress()
 end
 
 local function showZoneBanner(zoneId)
-	banner.Text = "ZONE " .. zoneId
+	banner.Text = "PALIER " .. zoneId
 	banner.Size = UDim2.fromOffset(320, 64)
 
 	TweenService:Create(banner, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
