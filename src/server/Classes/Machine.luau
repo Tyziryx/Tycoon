@@ -39,10 +39,12 @@ function Machine:spawn(tycoon)
 
 	-- Sauvegarder le niveau en attribut pour accès externe
 	clonedMachine:SetAttribute("CurrentLevel", self.currentLevel)
+	clonedMachine:SetAttribute("IsBuilding", true)
 
 	-- Configurer les effets visuels
 	local VisualEffectsService = require(script.Parent.Parent.Services.VisualEffectsService)
 	VisualEffectsService.setupMachineEffects(clonedMachine, self.name, self.currentLevel)
+	VisualEffectsService.playBuildAnimation(clonedMachine, self.config.BuildTime or 0)
 
 	-- Configurer le brûleur manuel si c'est un feu de camp
 	local ManualBurnerService = require(script.Parent.Parent.Services.ManualBurnerService)
@@ -74,13 +76,16 @@ function Machine:generateIncome()
 		return 0
 	end
 
-	local baseIncome = self.baseIncome
-	if self.currentLevel == 2 then
-		baseIncome *= 1.5
+	local multiplier = 1
+	if self.config.IncomeLevelMultipliers then
+		multiplier = self.config.IncomeLevelMultipliers[self.currentLevel] or multiplier
+	elseif self.currentLevel == 2 then
+		multiplier = 1.5
 	elseif self.currentLevel == 3 then
-		baseIncome *= 2
+		multiplier = 2
 	end
-	return baseIncome
+
+	return math.floor(self.baseIncome * multiplier)
 end
 
 function Machine:canUpgrade()
@@ -91,13 +96,12 @@ function Machine:getUpgradeCost()
 	if not self:canUpgrade() then
 		return nil
 	end
-	local cost = self.baseCost * self.currentLevel * 5
-	if self.id == 1 and self.currentLevel == 1 then
-		cost = 100
-	elseif self.id == 1 and self.currentLevel == 2 then
-		cost = 200
+
+	if self.config.UpgradeCosts then
+		return self.config.UpgradeCosts[self.currentLevel]
 	end
-	return cost
+
+	return self.baseCost * self.currentLevel * 5
 end
 
 function Machine:updateLevelAttributes()

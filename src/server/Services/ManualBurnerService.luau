@@ -1,7 +1,9 @@
 local ManualBurnerService = {}
 
 local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
 local PollutionService = require(script.Parent.PollutionService)
 
 -- Configuration pour les brûleurs manuels
@@ -13,7 +15,8 @@ local BurnerConfig = {
 
 -- Fonction pour vérifier si une machine est un feu de camp
 function ManualBurnerService.isCampFire(machineId)
-	return machineId == 1 or machineId == 2 or machineId == 3
+	local config = MachineConfig[machineId]
+	return config and config.Name == "CampFire"
 end
 
 -- Fonction appelée lors du spawn d'une machine pour configurer le brûleur si nécessaire
@@ -42,6 +45,10 @@ function ManualBurnerService.setupBurner(campfire, tycoon)
 end
 
 function ManualBurnerService.handleBurn(player, campfire, tycoon)
+	if campfire:GetAttribute("IsBuilding") then
+		return
+	end
+
 	-- Vérifier que c'est le bon joueur pour ce tycoon
 	if tycoon:GetAttribute("UserId") ~= player.UserId then
 		return
@@ -49,7 +56,7 @@ function ManualBurnerService.handleBurn(player, campfire, tycoon)
 
 	-- Vérifier le cooldown
 	local lastBurnTime = campfire:GetAttribute("LastBurnTime") or 0
-	local currentTime = tick()
+	local currentTime = os.clock()
 	if currentTime - lastBurnTime < BurnerConfig.COOLDOWN_TIME then
 		return
 	end
@@ -59,14 +66,19 @@ function ManualBurnerService.handleBurn(player, campfire, tycoon)
 
 	-- Calculer les récompenses basées sur le niveau de la machine
 	local level = campfire:GetAttribute("CurrentLevel") or 1
+	local machineId = campfire:GetAttribute("Id")
+	local machineConfig = MachineConfig[machineId] or {}
+	local basePollution = machineConfig.ManualPollution or BurnerConfig.BASE_POLLUTION
+	local levelMultiplier = machineConfig.ManualLevelMultiplier or BurnerConfig.LEVEL_MULTIPLIER
 
-	local pollutionGenerated = BurnerConfig.BASE_POLLUTION * (BurnerConfig.LEVEL_MULTIPLIER ^ (level - 1))
+	local pollutionGenerated = basePollution * (levelMultiplier ^ (level - 1))
 
 	-- Arrondir les valeurs
 	pollutionGenerated = math.floor(pollutionGenerated)
 
 	-- Donner les récompenses
 	PollutionService.addPollution(player, pollutionGenerated)
+	ManualBurnerService.createFloatingText(campfire, "+" .. pollutionGenerated .. " Pollution")
 
 	-- Effets visuels d'intensification temporaire
 	local VisualEffectsService = require(script.Parent.VisualEffectsService)
@@ -133,15 +145,14 @@ function ManualBurnerService.playBurnEffect(campfire, pollution)
 	end
 
 	findEffects(campfire)
-	print("Found smoke:", smoke)
 
 	if smoke then
 		local originalSize = smoke.Size
 		smoke.Size = originalSize * 1.5
 
 		-- Remettre à la normale après 1 seconde (non-bloquant)
-		spawn(function()
-			wait(1)
+		task.spawn(function()
+			task.wait(1)
 			if smoke and smoke.Parent then
 				smoke.Size = originalSize
 			end
@@ -153,8 +164,8 @@ function ManualBurnerService.playBurnEffect(campfire, pollution)
 		smoke.Opacity = math.min(1, originalOpacity * 1.5)
 
 		-- Remettre à la normale après 0.5 seconde (non-bloquant)
-		spawn(function()
-			wait(0.5)
+		task.spawn(function()
+			task.wait(0.5)
 			if smoke and smoke.Parent then
 				smoke.Opacity = originalOpacity
 			end
@@ -166,7 +177,6 @@ function ManualBurnerService.playBurnEffect(campfire, pollution)
 end
 
 function ManualBurnerService.createFloatingText(campfire, text)
-	print("Creating floating text for", text)
 	-- Créer un GUI temporaire pour afficher les gains
 	local billboardGui = Instance.new("BillboardGui")
 	billboardGui.Size = UDim2.new(0, 200, 0, 50)
