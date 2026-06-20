@@ -56,18 +56,41 @@ local function getPortalCFrame(tycoon)
 end
 
 local function setPortalLabel(portal, text)
-	local label = portal:FindFirstChild("ClaimLabel", true)
-	if label and label:IsA("TextLabel") then
-		label.Text = text
+	for _, descendant in portal:GetDescendants() do
+		if descendant.Name == "ClaimLabel" and descendant:IsA("TextLabel") then
+			descendant.Text = text
+		end
 	end
 end
 
 local function setPartColor(portal, color)
 	for _, descendant in portal:GetDescendants() do
-		if descendant:IsA("BasePart") then
+		if descendant:IsA("BasePart") and descendant:GetAttribute("StaticPortalColor") ~= true then
 			descendant.Color = color
 		end
 	end
+end
+
+local function createSignSurface(sign, face)
+	local surfaceGui = Instance.new("SurfaceGui")
+	surfaceGui.Name = "ClaimSurface"
+	surfaceGui.Face = face
+	surfaceGui.CanvasSize = Vector2.new(700, 220)
+	surfaceGui.LightInfluence = 0
+	surfaceGui.Parent = sign
+
+	local label = Instance.new("TextLabel")
+	label.Name = "ClaimLabel"
+	label.BackgroundTransparency = 1
+	label.BorderSizePixel = 0
+	label.Size = UDim2.new(1, 0, 1, 0)
+	label.Font = Enum.Font.GothamBlack
+	label.Text = "CLAIM\nZONE"
+	label.TextColor3 = Color3.fromRGB(255, 245, 210)
+	label.TextScaled = true
+	label.TextStrokeTransparency = 0
+	label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+	label.Parent = surfaceGui
 end
 
 local function connectPortalClaim(portal, tycoon)
@@ -143,6 +166,9 @@ function TycoonService.createClaimPortal(tycoon)
 	makePart("RightPillar", Vector3.new(0.55, 5, 0.55), portalCF * CFrame.new(3.25, 2.5, 0), freeColor, 0, portal)
 	local topBeam = makePart("TopBeam", Vector3.new(7.1, 0.55, 0.55), portalCF * CFrame.new(0, 5, 0), freeColor, 0, portal)
 	makePart("PortalGlow", Vector3.new(6.5, 4.2, 0.18), portalCF * CFrame.new(0, 2.6, 0.05), freeColor, 0.65, portal)
+	local sign = makePart("ClaimSign", Vector3.new(5.8, 1.45, 0.18), portalCF * CFrame.new(0, 4.08, -0.38), darkColor, 0, portal)
+	sign.Material = Enum.Material.SmoothPlastic
+	sign:SetAttribute("StaticPortalColor", true)
 
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "ClaimPrompt"
@@ -153,26 +179,8 @@ function TycoonService.createClaimPortal(tycoon)
 	prompt.RequiresLineOfSight = false
 	prompt.Parent = pad
 
-	local billboard = Instance.new("BillboardGui")
-	billboard.Name = "ClaimBillboard"
-	billboard.Size = UDim2.new(0, 220, 0, 76)
-	billboard.StudsOffset = Vector3.new(0, 1.3, 0)
-	billboard.AlwaysOnTop = true
-	billboard.Parent = topBeam
-
-	local label = Instance.new("TextLabel")
-	label.Name = "ClaimLabel"
-	label.BackgroundColor3 = darkColor
-	label.BackgroundTransparency = 0.15
-	label.BorderSizePixel = 0
-	label.Size = UDim2.new(1, 0, 1, 0)
-	label.Font = Enum.Font.GothamBold
-	label.Text = "CLAIM\nZONE"
-	label.TextColor3 = Color3.fromRGB(255, 245, 210)
-	label.TextScaled = true
-	label.TextStrokeTransparency = 0
-	label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-	label.Parent = billboard
+	createSignSurface(sign, Enum.NormalId.Front)
+	createSignSurface(sign, Enum.NormalId.Back)
 
 	connectPortalClaim(portal, tycoon)
 	TycoonService.updateClaimPortal(tycoon)

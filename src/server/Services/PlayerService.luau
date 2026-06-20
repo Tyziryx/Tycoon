@@ -7,7 +7,6 @@ local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
 local MoneyService = require(script.Parent.MoneyService)
 local PollutionService = require(script.Parent.PollutionService)
 local DefaultPlayerData = require(ReplicatedStorage.Shared.Config.PlayerData)
-local TycoonService = require(script.Parent.TycoonService)
 local ZoneService = require(script.Parent.ZoneService)
 local RebirthService = require(script.Parent.RebirthService)
 
@@ -65,7 +64,6 @@ function PlayerService.onPlayerAdded(player)
 	PollutionService.setupLeaderstats(player)
 	RebirthService.setupLeaderstats(player)
 	ZoneService.setupPlayer(player)
-	TycoonService.assignTycoon(player)
 end
 
 function PlayerService.init()
