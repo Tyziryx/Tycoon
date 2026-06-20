@@ -41,6 +41,39 @@ function PurchasableService.getMachine(machineId)
 	return nil
 end
 
+function PurchasableService.getMachineData(player, machineId)
+	local ownedMachines = player.Data:FindFirstChild("OwnedMachines")
+	if not ownedMachines then
+		return nil
+	end
+
+	local machineData = ownedMachines:FindFirstChild(tostring(machineId))
+	if machineData and machineData:IsA("Folder") then
+		return machineData
+	end
+
+	for _, legacyMachineData in ownedMachines:GetChildren() do
+		if legacyMachineData:IsA("IntValue") and legacyMachineData.Value == machineId then
+			return legacyMachineData
+		end
+	end
+
+	return nil
+end
+
+function PurchasableService.playerOwnsMachine(player, machineId)
+	return PurchasableService.getMachineData(player, machineId) ~= nil
+end
+
+function PurchasableService.getMachineLevel(player, machineId)
+	local machine = PurchasableService.getMachine(machineId)
+	if not machine then
+		return 0
+	end
+
+	return machine:getLevel(player)
+end
+
 function PurchasableService.getDecoration(decorationId)
 	local purchasable = purchasableInstances[decorationId]
 	if purchasable and purchasable.purchasableType == "Decoration" then
@@ -95,14 +128,36 @@ function PurchasableService.calculateTotalIncome(player)
 	local ownedMachines = player.Data.OwnedMachines
 
 	for _, machineData in ownedMachines:GetChildren() do
-		local machineId = machineData.Value
+		local machineId = tonumber(machineData.Name)
+		local level = 1
+		if machineData:IsA("Folder") then
+			local levelValue = machineData:FindFirstChild("Level")
+			level = levelValue and levelValue.Value or 1
+		elseif machineData:IsA("IntValue") then
+			machineId = machineData.Value
+		end
+
 		local machine = PurchasableService.getMachine(machineId)
 		if machine then
-			totalIncome = totalIncome + machine:generateIncome()
+			totalIncome = totalIncome + machine:generateIncome(level)
 		end
 	end
 
 	return totalIncome
+end
+
+function PurchasableService.resetPlayerMachines(player)
+	local ownedMachines = player.Data:FindFirstChild("OwnedMachines")
+	if ownedMachines then
+		ownedMachines:ClearAllChildren()
+	end
+
+	local TycoonService = require(script.Parent.TycoonService)
+	local tycoon = TycoonService.getTycoon(player)
+	local machines = tycoon and tycoon:FindFirstChild("Machines")
+	if machines then
+		machines:ClearAllChildren()
+	end
 end
 
 function PurchasableService.getAllMachines()

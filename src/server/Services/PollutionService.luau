@@ -40,6 +40,9 @@ function PollutionService.addPollution(player, amount)
 		warn("Player is nil")
 		return
 	end
+	if amount <= 0 then
+		return
+	end
 	local pollutionValue = player.Data:FindFirstChild("Pollution")
 
 	if pollutionValue then
@@ -59,6 +62,50 @@ function PollutionService.addPollution(player, amount)
 				player.leaderstats["Pollution Totale"].Value = totalData.Value
 			end
 		end
+
+		local runData = statsFolder and statsFolder:FindFirstChild("RunPollution")
+		if runData then
+			runData.Value = runData.Value + amount
+		end
+	end
+end
+
+function PollutionService.setPollution(player, amount)
+	if player == nil then
+		warn("Player is nil")
+		return
+	end
+	local pollutionValue = player.Data:FindFirstChild("Pollution")
+	if pollutionValue then
+		pollutionValue.Value = amount
+		if player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Pollution") then
+			player.leaderstats.Pollution.Value = pollutionValue.Value
+		end
+	end
+end
+
+function PollutionService.getRunPollution(player)
+	if player == nil then
+		warn("Player is nil")
+		return 0
+	end
+	local statsFolder = player.Data:FindFirstChild("Stats")
+	local runData = statsFolder and statsFolder:FindFirstChild("RunPollution")
+	if runData then
+		return runData.Value
+	end
+	return 0
+end
+
+function PollutionService.setRunPollution(player, amount)
+	if player == nil then
+		warn("Player is nil")
+		return
+	end
+	local statsFolder = player.Data:FindFirstChild("Stats")
+	local runData = statsFolder and statsFolder:FindFirstChild("RunPollution")
+	if runData then
+		runData.Value = amount
 	end
 end
 

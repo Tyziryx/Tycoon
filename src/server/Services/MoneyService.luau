@@ -56,6 +56,20 @@ function MoneyService.addMoney(player, amount)
 	end
 end
 
+function MoneyService.setMoney(player, amount)
+	if player == nil then
+		warn("Player is nil")
+		return
+	end
+	local moneyValue = player.Data:FindFirstChild("Money")
+	if moneyValue then
+		moneyValue.Value = amount
+		if player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Money") then
+			player.leaderstats.Money.Value = moneyValue.Value
+		end
+	end
+end
+
 function MoneyService.removeMoney(player, amount)
 	if player == nil then
 		warn("Player is nil")
