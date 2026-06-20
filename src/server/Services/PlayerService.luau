@@ -83,7 +83,6 @@ function PlayerService.updatePlayer()
 
 		local PurchasableService = require(script.Parent.PurchasableService)
 		local totalIncome = PurchasableService.calculateTotalIncome(player)
-		print("Revenus: " .. totalIncome .. " p/s")
 		PollutionService.addPollution(player, totalIncome)
 	end
 end

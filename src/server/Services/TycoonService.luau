@@ -2,6 +2,7 @@ local Tycoons = game.Workspace:WaitForChild("Tycoons")
 local TycoonService = {}
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
+local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
 local MoneyService = require(script.Parent.MoneyService)
 local PollutionService = require(script.Parent.PollutionService)
 
@@ -156,7 +157,7 @@ function TycoonService.initializeSellPoint(tycoon)
 			return
 		end
 
-		local moneyToAdd = math.floor(pollution / 10)
+		local moneyToAdd = math.floor(pollution * GameConfig.POLLUTION_TO_MONEY_RATE)
 		if pollution > 0 and moneyToAdd == 0 then
 			moneyToAdd = 1
 		end
