@@ -214,6 +214,7 @@ niveaux à coût **géométrique** (ex. ×1.5 par niveau).
 - [ ] **Machines des zones 2–5** : spécifier coûts/rendements + créer modèles & boutons.
 - [ ] **Sets de décor par zone** : pré-construire en Studio les modèles animables.
 - [ ] **Rebirth / Cendres** : `RebirthService` (reset + calcul du gain géométrique).
-- [ ] **Boutique de prestige** : UI + `ShopService` + application des multiplicateurs.
+- [x] **Boutique de prestige** : socle code UI + `ShopService` + application des
+      multiplicateurs. À tester en Studio et équilibrer.
 - [ ] **Courbe de prix** : recalibrer `MachineConfig` (×8–12 par zone) pour créer le mur.
 - [ ] Versionner le contenu 3D (modèles en `.rbxmx`/`.model.json`) pour le sortir de Studio.

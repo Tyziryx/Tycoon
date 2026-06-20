@@ -166,7 +166,8 @@ function Machine:getUpgradeCost(player)
 	local currentLevel = self:getLevel(player)
 	local nextTier = self.upgrades[currentLevel + 1]
 	if nextTier and nextTier.Cost then
-		return nextTier.Cost
+		local ShopService = require(script.Parent.Parent.Services.ShopService)
+		return ShopService.applyCostReduction(player, nextTier.Cost)
 	end
 	return nil
 end

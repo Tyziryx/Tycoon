@@ -5,6 +5,7 @@ local TweenService = game:GetService("TweenService")
 
 local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
 local PollutionService = require(script.Parent.PollutionService)
+local ShopService = require(script.Parent.ShopService)
 
 local BurnerConfig = {
 	COOLDOWN_TIME = 0.8,
@@ -58,7 +59,7 @@ function ManualBurnerService.handleBurn(player, campfire, tycoon)
 	local machineConfig = MachineConfig[machineId] or {}
 	local basePollution = machineConfig.ManualPollution or BurnerConfig.BASE_POLLUTION
 	local levelMultiplier = machineConfig.ManualLevelMultiplier or BurnerConfig.LEVEL_MULTIPLIER
-	local pollutionGenerated = math.floor(basePollution * (levelMultiplier ^ (level - 1)))
+	local pollutionGenerated = math.floor(basePollution * (levelMultiplier ^ (level - 1)) * ShopService.getManualBurnMultiplier(player))
 
 	PollutionService.addPollution(player, pollutionGenerated)
 	ManualBurnerService.createFloatingText(campfire, "+" .. pollutionGenerated .. " Pollution")
