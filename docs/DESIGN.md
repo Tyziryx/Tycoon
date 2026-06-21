@@ -308,8 +308,8 @@ Voir la note dédiée : [`docs/RANDOMNESS_PLACEMENT.md`](RANDOMNESS_PLACEMENT.md
 - [ ] **Rebirth / Cendres** : `RebirthService` (reset + calcul du gain géométrique).
 - [x] **Boutique de prestige** : socle code UI + `ShopService` + application des
       multiplicateurs. À tester en Studio et équilibrer.
-- [ ] **Aléatoire & placement libre** : inventorier les machines comme instances uniques,
-      ajouter placement grille, doublons, vente et recyclage (voir
-      `docs/RANDOMNESS_PLACEMENT.md`).
+- [x] **Aléatoire & placement libre** : socle d'instances uniques, placement grille,
+      doublons, vente, recyclage et fusion implémenté. Reste à produire l'UI finale,
+      les vrais visuels de variantes et la persistance (voir `docs/RANDOMNESS_PLACEMENT.md`).
 - [ ] **Courbe de prix** : recalibrer `MachineConfig` (×8–12 par palier) pour créer le mur.
 - [ ] Versionner le contenu 3D (modèles en `.rbxmx`/`.model.json`) pour le sortir de Studio.

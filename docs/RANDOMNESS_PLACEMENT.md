@@ -273,14 +273,50 @@ machine de Palier 5 productive dès le début d'un nouveau run.
 
 ## MVP recommandé
 
-1. Ajouter un inventaire d'instances avec `InstanceId`, `MachineId`, `VariantId`, `Rarity`.
-2. Ajouter un placement grille basique avec placeholders.
-3. Ajouter vente simple contre argent.
-4. Ajouter recyclage contre une ressource unique, par exemple `Ferraille`.
-5. Ajouter fusion de doublons.
-6. Ajouter variantes rares et traits.
-7. Ajouter album/collection.
-8. Ajouter pity system et sources événementielles.
+1. [x] Ajouter un inventaire d'instances avec `InstanceId`, `MachineId`, `VariantId`,
+   `Rarity`.
+2. [x] Ajouter un placement grille basique avec placeholders.
+3. [x] Ajouter vente simple contre argent.
+4. [x] Ajouter recyclage contre une ressource unique : `Ferraille`.
+5. [x] Ajouter fusion de doublons.
+6. [x] Ajouter variantes rares et traits.
+7. [x] Ajouter album/collection.
+8. [ ] Ajouter sources événementielles.
+
+## Implémentation actuelle
+
+Socle code ajouté :
+
+- `src/shared/Config/RandomMachineConfig.luau` : raretés, variantes, traits, coût de roll,
+  pity, vente, recyclage, fusion et grille.
+- `src/server/Services/MachineInventoryService.luau` : source de vérité des instances,
+  rolls, placement, vente, recyclage, fusion et remotes.
+- `src/client/UI/MachineInventory.client.luau` : UI de test pour roll/sélectionner,
+  choisir X/Z/rotation, placer, ranger, vendre, recycler, fusionner et verrouiller.
+- `Machine.luau` et `PurchasableService.luau` : les achats existants créent maintenant
+  des instances placées, et le revenu lit les instances placées.
+
+Remotes serveur :
+
+- `GetMachineInventoryRemote`
+- `RollMachineRemote`
+- `PlaceMachineRemote`
+- `UnplaceMachineRemote`
+- `SellMachineRemote`
+- `RecycleMachineRemote`
+- `FuseMachineRemote`
+- `ToggleMachineLockRemote`
+- `MachineInventoryUpdated`
+
+Limites connues du MVP :
+
+- le placement se fait par UI X/Z/rotation, pas encore par preview souris dans le monde ;
+- la persistance DataStore n'est pas encore branchée ;
+- les variantes utilisent surtout les placeholders et des attributs/tints, les vrais
+  visuels Studio restent à produire ;
+- les sources événementielles ne sont pas encore implémentées ;
+- la fusion consomme des doublons même `MachineId` + même rareté, sans exiger la même
+  variante pour garder le test moins frustrant.
 
 ## Points à décider avant implémentation
 

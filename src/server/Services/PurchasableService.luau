@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- Import des configurations
 local MachineConfig = require(ReplicatedStorage.Shared.Config.MachineConfig)
 local DecorationConfig = require(ReplicatedStorage.Shared.Config.DecorationConfig)
+local MachineInventoryService = require(script.Parent.MachineInventoryService)
 
 -- Import des classes
 local Machine = require(script.Parent.Parent.Classes.Machine)
@@ -42,6 +43,11 @@ function PurchasableService.getMachine(machineId)
 end
 
 function PurchasableService.getMachineData(player, machineId)
+	local inventoryMachineData = MachineInventoryService.findPlacedMachineData(player, machineId)
+	if inventoryMachineData then
+		return inventoryMachineData
+	end
+
 	local ownedMachines = player.Data:FindFirstChild("OwnedMachines")
 	if not ownedMachines then
 		return nil
@@ -139,7 +145,7 @@ function PurchasableService.upgradeMachine(player, machineId)
 end
 
 function PurchasableService.calculateTotalIncome(player)
-	local totalIncome = 0
+	local totalIncome = MachineInventoryService.calculatePlacedIncome(player)
 	local ownedMachines = player.Data.OwnedMachines
 
 	for _, machineData in ownedMachines:GetChildren() do
@@ -167,6 +173,7 @@ function PurchasableService.resetPlayerMachines(player)
 	if ownedMachines then
 		ownedMachines:ClearAllChildren()
 	end
+	MachineInventoryService.resetPlacedMachines(player)
 
 	local TycoonService = require(script.Parent.TycoonService)
 	local tycoon = TycoonService.getTycoon(player)

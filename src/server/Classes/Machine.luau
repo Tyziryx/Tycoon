@@ -1,6 +1,8 @@
 local Purchasable = require(script.Parent.Purchasable)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local RandomMachineConfig = require(ReplicatedStorage.Shared.Config.RandomMachineConfig)
+
 -- Classe Machine hérite de Purchasable
 local Machine = setmetatable({}, { __index = Purchasable })
 Machine.__index = Machine
@@ -58,6 +60,12 @@ local function createPlaceholderLabel(parent, displayName, machineId)
 end
 
 local function getMachineData(player, machineId)
+	local MachineInventoryService = require(script.Parent.Parent.Services.MachineInventoryService)
+	local inventoryMachineData = MachineInventoryService.findPlacedMachineData(player, machineId)
+	if inventoryMachineData then
+		return inventoryMachineData
+	end
+
 	local ownedMachines = player.Data:FindFirstChild("OwnedMachines")
 	if not ownedMachines then
 		return nil
@@ -77,6 +85,37 @@ local function getMachineData(player, machineId)
 	return nil
 end
 
+local function getDataValue(machineData, name, defaultValue)
+	local value = machineData and machineData:FindFirstChild(name)
+	if value then
+		return value.Value
+	end
+	return defaultValue
+end
+
+local function tintPlaceholderVariant(model, variantId, rarityId)
+	if model:GetAttribute("IsPlaceholder") ~= true then
+		return
+	end
+
+	local variant = RandomMachineConfig.Variants[variantId]
+	local rarity = RandomMachineConfig.Rarities[rarityId]
+	local tintColor = (variant and variant.Color) or (rarity and rarity.Color)
+	if not tintColor then
+		return
+	end
+
+	for _, descendant in model:GetDescendants() do
+		if descendant:IsA("BasePart") and descendant.Transparency < 1 then
+			descendant.Color = descendant.Color:Lerp(tintColor, 0.35)
+		end
+	end
+end
+
+function Machine:isOwnedByPlayer(player)
+	return getMachineData(player, self.id) ~= nil
+end
+
 function Machine:getLevel(player)
 	local machineData = getMachineData(player, self.id)
 	if not machineData then
@@ -91,7 +130,7 @@ function Machine:getLevel(player)
 	return 1
 end
 
-function Machine:spawn(tycoon, player)
+function Machine:spawn(tycoon, player, machineData)
 	local machineModel = self:getAssetModel()
 	if not machineModel then
 		warn("Modèle de machine introuvable pour ID:", self.id)
@@ -99,14 +138,16 @@ function Machine:spawn(tycoon, player)
 	end
 
 	local clonedMachine = machineModel:Clone()
-	local currentLevel = player and self:getLevel(player) or 1
+	local currentLevel = machineData and getDataValue(machineData, "Level", 1) or (player and self:getLevel(player) or 1)
 	if currentLevel <= 0 then
 		currentLevel = 1
 	end
 
 	-- Obtenir la position relative depuis TycoonService
 	local TycoonService = require(script.Parent.Parent.Services.TycoonService)
-	local relativeCF = TycoonService.getRelativeCFrame(self.id)
+	local MachineInventoryService = require(script.Parent.Parent.Services.MachineInventoryService)
+	local relativeCF = machineData and MachineInventoryService.getPlacementRelativeCFrame(machineData)
+		or TycoonService.getRelativeCFrame(self.id)
 	local worldCF = tycoon.PrimaryPart.CFrame:toWorldSpace(relativeCF)
 
 	clonedMachine:PivotTo(worldCF)
@@ -120,6 +161,15 @@ function Machine:spawn(tycoon, player)
 
 	-- Sauvegarder le niveau en attribut pour accès externe
 	clonedMachine:SetAttribute("Id", self.id)
+	if machineData then
+		local variantId = getDataValue(machineData, "VariantId", "Standard")
+		local rarityId = getDataValue(machineData, "Rarity", "Common")
+		clonedMachine:SetAttribute("InstanceId", machineData.Name)
+		clonedMachine:SetAttribute("VariantId", variantId)
+		clonedMachine:SetAttribute("Rarity", rarityId)
+		clonedMachine:SetAttribute("FusionLevel", getDataValue(machineData, "FusionLevel", 0))
+		tintPlaceholderVariant(clonedMachine, variantId, rarityId)
+	end
 	clonedMachine:SetAttribute("CurrentLevel", currentLevel)
 	clonedMachine:SetAttribute("IsBuilding", true)
 
@@ -135,34 +185,48 @@ function Machine:spawn(tycoon, player)
 	return true
 end
 
+function Machine:purchase(player, _tycoon)
+	if self:isOwnedByPlayer(player) then
+		return false, "Déjà acheté"
+	end
+
+	local canPurchase, reason = self:canPurchase(player)
+	if not canPurchase then
+		return false, reason
+	end
+
+	local machineData = self:addToPlayerData(player)
+	if not machineData then
+		return false, "Création impossible"
+	end
+
+	local MoneyService = require(script.Parent.Parent.Services.MoneyService)
+	if not MoneyService.removeMoney(player, self:getPurchaseCost(player)) then
+		local MachineInventoryService = require(script.Parent.Parent.Services.MachineInventoryService)
+		MachineInventoryService.unplaceMachine(player, machineData.Name, true)
+		machineData:Destroy()
+		return false, "Pas assez d'argent"
+	end
+
+	local MachineInventoryService = require(script.Parent.Parent.Services.MachineInventoryService)
+	MachineInventoryService.fireUpdated(player)
+	return true, "Acheté avec succès"
+end
+
 function Machine:addToPlayerData(player)
-	local ownedMachines = player.Data:FindFirstChild("OwnedMachines")
-	if not ownedMachines then
-		ownedMachines = Instance.new("Folder")
-		ownedMachines.Name = "OwnedMachines"
-		ownedMachines.Parent = player.Data
+	local MachineInventoryService = require(script.Parent.Parent.Services.MachineInventoryService)
+	local machineData, reason = MachineInventoryService.createMachineInstance(player, self.id, {
+		Rarity = "Common",
+		VariantId = "Standard",
+		Source = "Purchase",
+		Placed = true,
+	})
+
+	if not machineData then
+		warn("Création de machine impossible:", reason)
 	end
 
-	local existingMachine = ownedMachines:FindFirstChild(tostring(self.id))
-	if existingMachine then
-		return existingMachine
-	end
-
-	local machine = Instance.new("Folder")
-	machine.Name = tostring(self.id)
-	machine.Parent = ownedMachines
-
-	local machineId = Instance.new("IntValue")
-	machineId.Name = "Id"
-	machineId.Value = self.id
-	machineId.Parent = machine
-
-	local level = Instance.new("IntValue")
-	level.Name = "Level"
-	level.Value = 1
-	level.Parent = machine
-
-	return machine
+	return machineData
 end
 
 function Machine:getAssetModel()
@@ -269,7 +333,7 @@ function Machine:getUpgradeCost(player)
 	return nil
 end
 
-function Machine:updateLevelAttributes(player)
+function Machine:updateLevelAttributes(player, machineData)
 	-- Mettre à jour l'attribut CurrentLevel uniquement sur le tycoon du joueur.
 	local VisualEffectsService = require(script.Parent.Parent.Services.VisualEffectsService)
 	local TycoonService = require(script.Parent.Parent.Services.TycoonService)
@@ -278,12 +342,16 @@ function Machine:updateLevelAttributes(player)
 		return
 	end
 
-	local currentLevel = self:getLevel(player)
+	local currentLevel = machineData and getDataValue(machineData, "Level", 1) or self:getLevel(player)
+	local instanceId = machineData and machineData.Name
 	local machines = tycoon:FindFirstChild("Machines")
 	if machines then
 		for _, machine in machines:GetChildren() do
-			if machine:GetAttribute("Id") == self.id then
+			if (instanceId and machine:GetAttribute("InstanceId") == instanceId) or (not instanceId and machine:GetAttribute("Id") == self.id) then
 				machine:SetAttribute("CurrentLevel", currentLevel)
+				if machineData then
+					machine:SetAttribute("FusionLevel", getDataValue(machineData, "FusionLevel", 0))
+				end
 				VisualEffectsService.updateMachineEffects(machine, currentLevel)
 			end
 		end
@@ -321,7 +389,7 @@ function Machine:upgrade(player)
 	level.Value = level.Value + 1
 
 	-- Mettre à jour l'attribut sur toutes les instances de cette machine dans le monde
-	self:updateLevelAttributes(player)
+	self:updateLevelAttributes(player, machineData)
 
 	return true, "Machine améliorée au niveau " .. level.Value
 end

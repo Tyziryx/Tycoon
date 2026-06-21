@@ -397,8 +397,9 @@ function ButtonService.updateButton()
 			continue
 		end
 
+		local ownsItem = ButtonService.playerOwnsItem(player, info.itemType, info.targetId)
 		local isUpgradeButton = button:GetAttribute("IsUpgradeButton")
-		if isUpgradeButton and info.itemType == "Machine" then
+		if isUpgradeButton and info.itemType == "Machine" and ownsItem then
 			local machine = PurchasableService.getMachine(info.targetId)
 			if machine and machine:canUpgrade(player) then
 				local upgradeCost = machine:getUpgradeCost(player)
@@ -407,6 +408,13 @@ function ButtonService.updateButton()
 				end
 			end
 		else
+			if isUpgradeButton and info.itemType == "Machine" and not ownsItem then
+				button:SetAttribute("Unlocked", false)
+				button:SetAttribute("IsUpgradeButton", false)
+				button:SetAttribute("Maxed", false)
+				ButtonService.showButton(button)
+			end
+
 			local cost = PurchasableService.getPurchaseCost(player, info.itemType, info.targetId) or info.config.BaseCost
 			local hasPalier = playerHasRequiredPalier(player, info.config)
 			setButtonText(button, formatCostText(info.config, cost))

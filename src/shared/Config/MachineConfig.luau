@@ -101,6 +101,8 @@ for id, spec in ipairs(MachineSpecs) do
 		BuildTime = math.min(8, 1.25 + palier + (((id - 1) % 10) * 0.25)),
 		UnlockDelay = id == 1 and 0 or math.min(5, ((id - 1) % 10) * 0.25),
 		PlaceholderColor = PALIER_COLORS[palier],
+		FootprintX = palier >= 4 and 2 or 1,
+		FootprintZ = palier >= 4 and 2 or 1,
 		ManualBurner = internalName == "CampFire",
 		ManualPollution = math.max(1, math.floor(baseIncome * 0.6)),
 		ManualLevelMultiplier = 2,
