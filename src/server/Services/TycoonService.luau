@@ -84,7 +84,7 @@ local function createSignSurface(sign, face)
 	label.Name = "ClaimLabel"
 	label.BackgroundTransparency = 1
 	label.BorderSizePixel = 0
-	label.Size = UDim2.new(1, 0, 1, 0)
+	label.Size = UDim2.fromScale(1, 1)
 	label.Font = Enum.Font.GothamBlack
 	label.Text = "CLAIM\nZONE"
 	label.TextColor3 = Color3.fromRGB(255, 245, 210)
@@ -165,7 +165,7 @@ function TycoonService.createClaimPortal(tycoon)
 
 	makePart("LeftPillar", Vector3.new(0.55, 5, 0.55), portalCF * CFrame.new(-3.25, 2.5, 0), freeColor, 0, portal)
 	makePart("RightPillar", Vector3.new(0.55, 5, 0.55), portalCF * CFrame.new(3.25, 2.5, 0), freeColor, 0, portal)
-	local topBeam = makePart("TopBeam", Vector3.new(7.1, 0.55, 0.55), portalCF * CFrame.new(0, 5, 0), freeColor, 0, portal)
+	makePart("TopBeam", Vector3.new(7.1, 0.55, 0.55), portalCF * CFrame.new(0, 5, 0), freeColor, 0, portal)
 	makePart("PortalGlow", Vector3.new(6.5, 4.2, 0.18), portalCF * CFrame.new(0, 2.6, 0.05), freeColor, 0.65, portal)
 	local sign = makePart("ClaimSign", Vector3.new(5.8, 1.45, 0.18), portalCF * CFrame.new(0, 4.08, -0.38), darkColor, 0, portal)
 	sign.Material = Enum.Material.SmoothPlastic
@@ -276,14 +276,13 @@ function TycoonService.getRelativeCFrame(machineId)
 		return originalPosition
 	end
 
-	local defaultPositions = {
-		[1] = CFrame.new(0, 0, 0),
-		[2] = CFrame.new(8, 0, 0),
-		[3] = CFrame.new(16, 0, 0),
-	}
-
-	warn("Position originale non trouvee pour machine ID:", machineId, "- utilisation fallback")
-	return defaultPositions[machineId] or CFrame.new(0, 0, 0)
+	local slot = (machineId - 1) % 10
+	local palierIndex = math.floor((machineId - 1) / 10)
+	local column = slot % 5
+	local row = math.floor(slot / 5)
+	local x = -18 + (column * 9)
+	local z = -8 - (palierIndex * 18) - (row * 8)
+	return CFrame.new(x, 0, z)
 end
 
 function TycoonService.getRelativeDecorationCFrame(decorationId)

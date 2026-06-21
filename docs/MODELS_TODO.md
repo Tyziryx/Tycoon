@@ -43,7 +43,28 @@ Notes:
   - `Level3` becomes visible at level 3.
 - Put only visual parts/meshes/particles/lights in `TierVisuals`, not gameplay hitboxes.
 
-## Zone 1 Campfires
+## Placeholder Replacement Contract
+
+The code can now generate temporary gameplay placeholders when Studio content is missing.
+These placeholders are only scaffolding: replace them by adding real Studio content with the
+same IDs.
+
+To replace a placeholder machine:
+- add a model under `ReplicatedStorage.Tycoon.Machines`;
+- set `Attribute Id = <MachineConfig id>`;
+- set `PrimaryPart`;
+- keep optional `FireAnchor`, `SmokeAnchor`, and `TierVisuals` if that machine needs effects.
+
+To replace a placeholder button:
+- add a part inside the matching tycoon;
+- tag it `TycoonButton`;
+- set `Attribute machineId = <MachineConfig id>`;
+- add a `Cost` BillboardGui/SurfaceGui with a TextLabel.
+
+If a real model/button with the right ID exists before server startup, the placeholder is not
+created for that ID.
+
+## Palier 1 Campfires
 
 ### CampFire Level 1
 
@@ -136,7 +157,7 @@ CampfirePollutionProps
 - [ ] Test upgrade reveal animation from Level1 to Level2 to Level3.
 - [ ] Replace temporary/internal button sounds with approved `rbxassetid://...` sounds.
 
-## Future Zone 1 Models
+## Future Palier 1 Models
 
 After CampFire is clean:
 

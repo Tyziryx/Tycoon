@@ -19,6 +19,44 @@ function Machine.new(id, config)
 	return self
 end
 
+local function createAnchoredPart(name, size, cframe, color, parent)
+	local part = Instance.new("Part")
+	part.Name = name
+	part.Size = size
+	part.CFrame = cframe
+	part.Color = color
+	part.Material = Enum.Material.Metal
+	part.Anchored = true
+	part.CanCollide = true
+	part.CanTouch = true
+	part.CanQuery = true
+	part.Parent = parent
+	return part
+end
+
+local function createPlaceholderLabel(parent, displayName, machineId)
+	local billboard = Instance.new("BillboardGui")
+	billboard.Name = "PlaceholderLabel"
+	billboard.Size = UDim2.fromOffset(220, 58)
+	billboard.StudsOffset = Vector3.new(0, 4, 0)
+	billboard.AlwaysOnTop = true
+	billboard.Parent = parent
+
+	local label = Instance.new("TextLabel")
+	label.Name = "Label"
+	label.Size = UDim2.fromScale(1, 1)
+	label.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+	label.BackgroundTransparency = 0.18
+	label.BorderSizePixel = 0
+	label.Font = Enum.Font.GothamBold
+	label.Text = "#" .. machineId .. " " .. displayName
+	label.TextColor3 = Color3.fromRGB(245, 245, 245)
+	label.TextScaled = true
+	label.TextWrapped = true
+	label.TextStrokeTransparency = 0.35
+	label.Parent = billboard
+end
+
 local function getMachineData(player, machineId)
 	local ownedMachines = player.Data:FindFirstChild("OwnedMachines")
 	if not ownedMachines then
@@ -128,14 +166,73 @@ function Machine:addToPlayerData(player)
 end
 
 function Machine:getAssetModel()
-	local tycoon = ReplicatedStorage:WaitForChild("Tycoon")
-	local machines = tycoon:WaitForChild("Machines")
+	local tycoon = ReplicatedStorage:FindFirstChild("Tycoon")
+	if not tycoon then
+		tycoon = Instance.new("Folder")
+		tycoon.Name = "Tycoon"
+		tycoon.Parent = ReplicatedStorage
+	end
+
+	local machines = tycoon:FindFirstChild("Machines")
+	if not machines then
+		machines = Instance.new("Folder")
+		machines.Name = "Machines"
+		machines.Parent = tycoon
+	end
+
 	for _, machineModel in machines:GetChildren() do
 		if machineModel:GetAttribute("Id") == self.id then
 			return machineModel
 		end
 	end
-	return nil
+
+	local placeholder = Instance.new("Model")
+	placeholder.Name = "PlaceholderMachine_" .. self.id
+	placeholder:SetAttribute("Id", self.id)
+	placeholder:SetAttribute("IsPlaceholder", true)
+	placeholder:SetAttribute("DisplayName", self.config.DisplayName or self.name)
+
+	local color = self.config.PlaceholderColor or Color3.fromRGB(125, 125, 125)
+	local base = createAnchoredPart("Body", Vector3.new(4, 3, 4), CFrame.new(0, 1.5, 0), color, placeholder)
+	placeholder.PrimaryPart = base
+
+	local top = createAnchoredPart(
+		"Stack",
+		Vector3.new(1.2, 3, 1.2),
+		CFrame.new(0, 4.5, 0),
+		color:Lerp(Color3.fromRGB(25, 25, 25), 0.35),
+		placeholder
+	)
+	top.CanTouch = false
+
+	local fireAnchor = createAnchoredPart(
+		"FireAnchor",
+		Vector3.new(0.5, 0.5, 0.5),
+		CFrame.new(0, 3.1, 0),
+		Color3.fromRGB(255, 125, 35),
+		placeholder
+	)
+	fireAnchor.Transparency = 1
+	fireAnchor.CanCollide = false
+	fireAnchor.CanTouch = false
+	fireAnchor.CanQuery = false
+
+	local smokeAnchor = createAnchoredPart(
+		"SmokeAnchor",
+		Vector3.new(0.5, 0.5, 0.5),
+		CFrame.new(0, 6.1, 0),
+		Color3.fromRGB(25, 25, 25),
+		placeholder
+	)
+	smokeAnchor.Transparency = 1
+	smokeAnchor.CanCollide = false
+	smokeAnchor.CanTouch = false
+	smokeAnchor.CanQuery = false
+
+	createPlaceholderLabel(base, self.config.DisplayName or self.name, self.id)
+	placeholder.Parent = machines
+
+	return placeholder
 end
 
 function Machine:generateIncome(level)
