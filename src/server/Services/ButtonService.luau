@@ -44,6 +44,10 @@ local function setButtonText(button, text)
 	end
 end
 
+local function formatCostText(itemName, cost)
+	return itemName .. " " .. cost .. " $"
+end
+
 local function getButtonInfo(buttonId)
 	if buttonId < 1000 then
 		return {
@@ -137,7 +141,7 @@ function ButtonService.init()
 		end
 
 		setupButtonSounds(button)
-		setButtonText(button, info.config.Name .. " " .. info.config.BaseCost .. " $")
+		setButtonText(button, formatCostText(info.config.Name, info.config.BaseCost))
 
 		button.Touched:Connect(function(hit)
 			ButtonService.handleTouch(button, buttonId, hit)
@@ -270,7 +274,9 @@ function ButtonService.updateButton()
 				end
 			end
 		else
-			button.Color = MoneyService.canAfford(player, info.config.BaseCost) and greenButton or redButton
+			local cost = PurchasableService.getPurchaseCost(player, info.itemType, info.targetId) or info.config.BaseCost
+			setButtonText(button, formatCostText(info.config.Name, cost))
+			button.Color = MoneyService.canAfford(player, cost) and greenButton or redButton
 		end
 	end
 end
@@ -467,7 +473,8 @@ function ButtonService.resetMachineButtonsForPlayer(player)
 		button:SetAttribute("Unlocked", false)
 		button:SetAttribute("IsUpgradeButton", false)
 		button:SetAttribute("Maxed", false)
-		setButtonText(button, machineConfig.Name .. " " .. machineConfig.BaseCost .. " $")
+		local cost = PurchasableService.getPurchaseCost(player, "Machine", buttonId) or machineConfig.BaseCost
+		setButtonText(button, formatCostText(machineConfig.Name, cost))
 
 		if buttonId == 1 then
 			ButtonService.showButton(button)

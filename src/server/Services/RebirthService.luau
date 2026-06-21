@@ -7,6 +7,7 @@ local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
 local MoneyService = require(script.Parent.MoneyService)
 local PollutionService = require(script.Parent.PollutionService)
 local PurchasableService = require(script.Parent.PurchasableService)
+local ShopService = require(script.Parent.ShopService)
 local ZoneService = require(script.Parent.ZoneService)
 
 local RebirthService = {}
@@ -141,21 +142,14 @@ function RebirthService.getCendres(player)
 end
 
 function RebirthService.addCendres(player, amount)
-	local cendres = getCendresValue(player)
-	if not cendres then
-		return
-	end
-
-	cendres.Value = cendres.Value + amount
-	if player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Cendres") then
-		player.leaderstats.Cendres.Value = cendres.Value
-	end
+	ShopService.addCendres(player, amount)
 end
 
 function RebirthService.calculateCendres(player)
 	local config = getRebirthConfig()
 	local zoneReached = ZoneService.getCurrentZone(player)
-	return math.floor(config.ASH_BASE * (config.ASH_GROWTH ^ (zoneReached - 1)))
+	local baseGain = config.ASH_BASE * (config.ASH_GROWTH ^ (zoneReached - 1))
+	return math.floor(baseGain * ShopService.getPrestigeGainMultiplier(player))
 end
 
 function RebirthService.canRebirth(player)
@@ -180,7 +174,7 @@ function RebirthService.tryRebirth(player)
 	local cendresGain = RebirthService.calculateCendres(player)
 	RebirthService.addCendres(player, cendresGain)
 
-	MoneyService.setMoney(player, GameConfig.STARTING_MONEY)
+	MoneyService.setMoney(player, ShopService.getStartingMoney(player, GameConfig.STARTING_MONEY))
 	PollutionService.setPollution(player, 0)
 	PollutionService.setRunPollution(player, 0)
 	ZoneService.resetPlayer(player)

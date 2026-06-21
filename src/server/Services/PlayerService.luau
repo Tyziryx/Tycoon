@@ -9,6 +9,7 @@ local PollutionService = require(script.Parent.PollutionService)
 local DefaultPlayerData = require(ReplicatedStorage.Shared.Config.PlayerData)
 local ZoneService = require(script.Parent.ZoneService)
 local RebirthService = require(script.Parent.RebirthService)
+local ShopService = require(script.Parent.ShopService)
 
 local PlayerService = {}
 
@@ -54,6 +55,7 @@ function PlayerService.onPlayerAdded(player)
 	dataFolder.Parent = player
 
 	populateDataFolder(dataFolder, DefaultPlayerData)
+	ShopService.setupPlayer(player)
 
 	local moneyValue = dataFolder:FindFirstChild("Money")
 	if moneyValue then
