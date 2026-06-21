@@ -82,15 +82,13 @@ function TycoonService.getRelativeCFrame(machineId)
 		return originalPosition
 	end
 
-	-- Fallback: positions par défaut si la position originale n'est pas trouvée
-	local defaultPositions = {
-		[1] = CFrame.new(0, 0, 0), -- Premier campfire
-		[2] = CFrame.new(8, 0, 0), -- Deuxième campfire
-		[3] = CFrame.new(16, 0, 0), -- Troisième campfire
-	}
-
-	warn("Position originale non trouvée pour machine ID:", machineId, "- Utilisation position par défaut")
-	return defaultPositions[machineId] or CFrame.new(0, 0, 0)
+	local slot = (machineId - 1) % 10
+	local palierIndex = math.floor((machineId - 1) / 10)
+	local column = slot % 5
+	local row = math.floor(slot / 5)
+	local x = -18 + (column * 9)
+	local z = -8 - (palierIndex * 18) - (row * 8)
+	return CFrame.new(x, 0, z)
 end
 
 function TycoonService.getRelativeDecorationCFrame(decorationId)

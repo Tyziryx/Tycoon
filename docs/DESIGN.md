@@ -293,8 +293,8 @@ niveaux à coût **géométrique** (ex. ×1.5 par niveau).
 - [ ] **Rééquilibrage** : `STARTING_MONEY = 250000` est une valeur de debug.
 - [ ] **Paliers** : `ZoneService` qui surveille la Pollution du run et émet
       `ZoneReached`, déclenchant l'animation de transition (décor + atmosphère + audio).
-- [x] **Machines des paliers 1–5** : proposition de coûts/rendements ajoutée au design.
-      À créer ensuite dans `MachineConfig`, puis en modèles & boutons Studio.
+- [x] **Machines des paliers 1–5** : coûts/rendements ajoutés dans `MachineConfig`,
+      avec modèles et boutons placeholders remplaçables par les assets Studio.
 - [ ] **Sets de décor par palier** : pré-construire en Studio les modèles animables.
 - [ ] **Rebirth / Cendres** : `RebirthService` (reset + calcul du gain géométrique).
 - [ ] **Boutique de prestige** : UI + `ShopService` + application des multiplicateurs.

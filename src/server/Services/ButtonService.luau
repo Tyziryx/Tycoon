@@ -38,10 +38,32 @@ local function setButtonText(button, text)
 		return
 	end
 
-	local label = costGui:GetChildren()[1]
+	local label = costGui:FindFirstChildWhichIsA("TextLabel", true)
 	if label and label:IsA("TextLabel") then
 		label.Text = text
 	end
+end
+
+local function getDisplayName(config)
+	return config.DisplayName or config.Name
+end
+
+local function formatMoney(amount)
+	if amount >= 1000000000000 then
+		return string.format("%.1fT$", amount / 1000000000000)
+	elseif amount >= 1000000000 then
+		return string.format("%.1fB$", amount / 1000000000)
+	elseif amount >= 1000000 then
+		return string.format("%.1fM$", amount / 1000000)
+	elseif amount >= 1000 then
+		return string.format("%.1fK$", amount / 1000)
+	end
+
+	return tostring(amount) .. "$"
+end
+
+local function getPurchaseButtonText(config)
+	return getDisplayName(config) .. " " .. formatMoney(config.BaseCost)
 end
 
 local function getButtonInfo(buttonId)
@@ -86,6 +108,114 @@ local function getCostGuiEnabled(button)
 	return costGui and costGui.Enabled
 end
 
+local function playerHasRequiredPalier(player, config)
+	local currentZone = player.Data and player.Data:FindFirstChild("CurrentZone")
+	if not currentZone or not config.ZoneRequired then
+		return true
+	end
+
+	return currentZone.Value >= config.ZoneRequired
+end
+
+local function getPlaceholderButtonCFrame(tycoon, machineId)
+	if not tycoon.PrimaryPart then
+		return CFrame.new(0, 2, 0)
+	end
+
+	local slot = (machineId - 1) % 10
+	local palierIndex = math.floor((machineId - 1) / 10)
+	local x = -22.5 + (slot * 5)
+	local z = 15 + (palierIndex * 6)
+	return tycoon.PrimaryPart.CFrame:ToWorldSpace(CFrame.new(x, 0.4, z))
+end
+
+local function hasButtonForTycoon(machineId, tycoon)
+	for _, button in CollectionService:GetTagged("TycoonButton") do
+		if button:IsDescendantOf(tycoon) and button:GetAttribute("machineId") == machineId then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function createPlaceholderCostGui(button, config)
+	local costGui = Instance.new("BillboardGui")
+	costGui.Name = "Cost"
+	costGui.Size = UDim2.fromOffset(190, 62)
+	costGui.StudsOffset = Vector3.new(0, 2.8, 0)
+	costGui.AlwaysOnTop = true
+	costGui.Parent = button
+
+	local label = Instance.new("TextLabel")
+	label.Name = "TextLabel"
+	label.Size = UDim2.fromScale(1, 1)
+	label.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+	label.BackgroundTransparency = 0.15
+	label.BorderSizePixel = 0
+	label.Font = Enum.Font.GothamBold
+	label.TextColor3 = Color3.fromRGB(245, 245, 245)
+	label.TextScaled = true
+	label.TextWrapped = true
+	label.TextStrokeTransparency = 0.35
+	label.Text = getPurchaseButtonText(config)
+	label.Parent = costGui
+end
+
+local function createPlaceholderButton(tycoon, machineId, config)
+	local folder = tycoon:FindFirstChild("PlaceholderButtons")
+	if not folder then
+		folder = Instance.new("Folder")
+		folder.Name = "PlaceholderButtons"
+		folder.Parent = tycoon
+	end
+
+	local button = Instance.new("Part")
+	button.Name = "PlaceholderButton_" .. machineId
+	button.Size = Vector3.new(4, 0.45, 4)
+	button.CFrame = getPlaceholderButtonCFrame(tycoon, machineId)
+	button.Anchored = true
+	button.CanCollide = false
+	button.CanTouch = true
+	button.CanQuery = false
+	button.Material = Enum.Material.Neon
+	button.Color = redButton
+	button:SetAttribute("machineId", machineId)
+	button:SetAttribute("IsPlaceholderButton", true)
+	button.Parent = folder
+
+	local base = Instance.new("Part")
+	base.Name = "Base"
+	base.Size = Vector3.new(4.4, 0.25, 4.4)
+	base.CFrame = button.CFrame * CFrame.new(0, -0.35, 0)
+	base.Anchored = true
+	base.CanCollide = false
+	base.CanTouch = false
+	base.CanQuery = false
+	base.Material = Enum.Material.Metal
+	base.Color = config.PlaceholderColor or Color3.fromRGB(80, 80, 80)
+	base.Parent = button
+
+	createPlaceholderCostGui(button, config)
+	CollectionService:AddTag(button, "TycoonButton")
+	return button
+end
+
+function ButtonService.ensurePlaceholderButtons()
+	local tycoons = Workspace:FindFirstChild("Tycoons")
+	if not tycoons then
+		return
+	end
+
+	for _, tycoon in tycoons:GetChildren() do
+		for machineId, config in pairs(MachineConfig) do
+			if not hasButtonForTycoon(machineId, tycoon) then
+				createPlaceholderButton(tycoon, machineId, config)
+			end
+		end
+	end
+end
+
 local function setupButtonSound(button, soundConfig)
 	local sound = button:FindFirstChild(soundConfig.Name)
 	if not sound then
@@ -123,6 +253,8 @@ function ButtonService.init()
 		ButtonService.updateButton()
 	end)
 
+	ButtonService.ensurePlaceholderButtons()
+
 	for _, button in CollectionService:GetTagged("TycoonButton") do
 		local buttonId = button:GetAttribute("machineId")
 		if not buttonId then
@@ -137,7 +269,7 @@ function ButtonService.init()
 		end
 
 		setupButtonSounds(button)
-		setButtonText(button, info.config.Name .. " " .. info.config.BaseCost .. " $")
+		setButtonText(button, getPurchaseButtonText(info.config))
 
 		button.Touched:Connect(function(hit)
 			ButtonService.handleTouch(button, buttonId, hit)
@@ -270,7 +402,8 @@ function ButtonService.updateButton()
 				end
 			end
 		else
-			button.Color = MoneyService.canAfford(player, info.config.BaseCost) and greenButton or redButton
+			local hasPalier = playerHasRequiredPalier(player, info.config)
+			button.Color = (hasPalier and MoneyService.canAfford(player, info.config.BaseCost)) and greenButton or redButton
 		end
 	end
 end
@@ -382,9 +515,12 @@ function ButtonService.updateUpgradeButtonText(button, machineId, player)
 	if machine:canUpgrade(player) then
 		local upgradeCost = machine:getUpgradeCost(player)
 		local nextLevel = machine:getLevel(player) + 1
-		setButtonText(button, "Upgrade " .. machineConfig.Name .. " Lvl." .. nextLevel .. " - " .. upgradeCost .. "$")
+		setButtonText(
+			button,
+			"Upgrade " .. getDisplayName(machineConfig) .. " Lvl." .. nextLevel .. " - " .. formatMoney(upgradeCost)
+		)
 	else
-		setButtonText(button, machineConfig.Name .. " Max")
+		setButtonText(button, getDisplayName(machineConfig) .. " Max")
 	end
 end
 
@@ -467,7 +603,7 @@ function ButtonService.resetMachineButtonsForPlayer(player)
 		button:SetAttribute("Unlocked", false)
 		button:SetAttribute("IsUpgradeButton", false)
 		button:SetAttribute("Maxed", false)
-		setButtonText(button, machineConfig.Name .. " " .. machineConfig.BaseCost .. " $")
+		setButtonText(button, getPurchaseButtonText(machineConfig))
 
 		if buttonId == 1 then
 			ButtonService.showButton(button)

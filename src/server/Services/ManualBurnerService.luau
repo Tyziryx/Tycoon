@@ -14,7 +14,7 @@ local BurnerConfig = {
 
 function ManualBurnerService.isCampFire(machineId)
 	local config = MachineConfig[machineId]
-	return config and config.Name == "CampFire"
+	return config and (config.ManualBurner == true or config.Name == "CampFire")
 end
 
 function ManualBurnerService.onMachineSpawned(machine, tycoon, machineId)
@@ -24,11 +24,12 @@ function ManualBurnerService.onMachineSpawned(machine, tycoon, machineId)
 end
 
 function ManualBurnerService.setupBurner(campfire, tycoon)
-	local clickDetector = campfire:FindFirstChild("ClickDetector")
+	local clickTarget = campfire.PrimaryPart or campfire:FindFirstChildWhichIsA("BasePart", true) or campfire
+	local clickDetector = clickTarget:FindFirstChild("ClickDetector")
 	if not clickDetector then
 		clickDetector = Instance.new("ClickDetector")
 		clickDetector.MaxActivationDistance = 15
-		clickDetector.Parent = campfire
+		clickDetector.Parent = clickTarget
 	end
 
 	clickDetector.MouseClick:Connect(function(player)
