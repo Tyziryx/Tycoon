@@ -82,6 +82,21 @@ function PurchasableService.getDecoration(decorationId)
 	return nil
 end
 
+function PurchasableService.getPurchaseCost(player, itemType, itemId)
+	local purchasable = nil
+	if itemType == "Machine" then
+		purchasable = PurchasableService.getMachine(itemId)
+	elseif itemType == "Decoration" then
+		purchasable = PurchasableService.getDecoration(itemId + 1000)
+	end
+
+	if purchasable and purchasable.getPurchaseCost then
+		return purchasable:getPurchaseCost(player)
+	end
+
+	return nil
+end
+
 function PurchasableService.unlockMachine(player, machineId)
 	local machine = PurchasableService.getMachine(machineId)
 	if not machine then
@@ -143,7 +158,8 @@ function PurchasableService.calculateTotalIncome(player)
 		end
 	end
 
-	return totalIncome
+	local ShopService = require(script.Parent.ShopService)
+	return totalIncome * ShopService.getIncomeMultiplier(player)
 end
 
 function PurchasableService.resetPlayerMachines(player)

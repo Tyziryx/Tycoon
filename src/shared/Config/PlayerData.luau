@@ -6,6 +6,14 @@ local DefaultPlayerData = {
 	UnlockedZones = {
 		["1"] = true,
 	},
+	PrestigeUpgrades = {
+		IncomeMultiplier = 0,
+		SellMultiplier = 0,
+		CostReduction = 0,
+		ManualBurnBoost = 0,
+		StarterCash = 0,
+		PrestigeGain = 0,
+	},
 	OwnedMachines = {},
 	OwnedDecorations = {},
 	Stats = {

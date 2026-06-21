@@ -285,9 +285,9 @@ niveaux à coût **géométrique** (ex. ×1.5 par niveau).
 
 ## TODO / idées futures
 
-- [ ] **Bug multijoueur** : les instances `Machine` sont des singletons partagés
+- [x] **Bug multijoueur** : les instances `Machine` sont des singletons partagés
       (`PurchasableService.init`) → `isUnlocked`/`currentLevel` sont communs à tous les
-      joueurs. À rendre par-joueur avant tout test à +1 joueur.
+      joueurs. Corrigé via les données joueur `OwnedMachines/<machineId>/Level`.
 - [ ] **Persistance** (`DataStore`) + **gains hors-ligne**.
 - [ ] **Classement global** via `OrderedDataStore`.
 - [ ] **Rééquilibrage** : `STARTING_MONEY = 250000` est une valeur de debug.
@@ -297,6 +297,7 @@ niveaux à coût **géométrique** (ex. ×1.5 par niveau).
       avec modèles et boutons placeholders remplaçables par les assets Studio.
 - [ ] **Sets de décor par palier** : pré-construire en Studio les modèles animables.
 - [ ] **Rebirth / Cendres** : `RebirthService` (reset + calcul du gain géométrique).
-- [ ] **Boutique de prestige** : UI + `ShopService` + application des multiplicateurs.
+- [x] **Boutique de prestige** : socle code UI + `ShopService` + application des
+      multiplicateurs. À tester en Studio et équilibrer.
 - [ ] **Courbe de prix** : recalibrer `MachineConfig` (×8–12 par palier) pour créer le mur.
 - [ ] Versionner le contenu 3D (modèles en `.rbxmx`/`.model.json`) pour le sortir de Studio.

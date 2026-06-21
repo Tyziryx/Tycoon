@@ -38,6 +38,15 @@ function Purchasable:isOwnedByPlayer(player)
 	return false
 end
 
+function Purchasable:getPurchaseCost(player)
+	if self.purchasableType ~= "Machine" then
+		return self.baseCost
+	end
+
+	local ShopService = require(script.Parent.Parent.Services.ShopService)
+	return ShopService.applyCostReduction(player, self.baseCost)
+end
+
 function Purchasable:canPurchase(player)
 	-- Vérifier les zones débloquées
 	local currentZone = player.Data:FindFirstChild("CurrentZone")
@@ -47,7 +56,7 @@ function Purchasable:canPurchase(player)
 
 	-- Vérifier si le joueur a assez d'argent
 	local MoneyService = require(script.Parent.Parent.Services.MoneyService)
-	if not MoneyService.canAfford(player, self.baseCost) then
+	if not MoneyService.canAfford(player, self:getPurchaseCost(player)) then
 		return false, "Pas assez d'argent"
 	end
 
@@ -72,7 +81,7 @@ function Purchasable:purchase(player, tycoon)
 
 	-- Déduire le coût
 	local MoneyService = require(script.Parent.Parent.Services.MoneyService)
-	MoneyService.removeMoney(player, self.baseCost)
+	MoneyService.removeMoney(player, self:getPurchaseCost(player))
 
 	-- Ajouter aux données du joueur
 	self:addToPlayerData(player)

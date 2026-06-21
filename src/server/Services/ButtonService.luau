@@ -49,6 +49,7 @@ local function getDisplayName(config)
 end
 
 local function formatMoney(amount)
+	amount = math.floor(amount)
 	if amount >= 1000000000000 then
 		return string.format("%.1fT$", amount / 1000000000000)
 	elseif amount >= 1000000000 then
@@ -62,8 +63,12 @@ local function formatMoney(amount)
 	return tostring(amount) .. "$"
 end
 
-local function getPurchaseButtonText(config)
-	return getDisplayName(config) .. " " .. formatMoney(config.BaseCost)
+local function formatCostText(config, cost)
+	return getDisplayName(config) .. " " .. formatMoney(cost)
+end
+
+local function getPurchaseButtonText(config, cost)
+	return formatCostText(config, cost or config.BaseCost)
 end
 
 local function getButtonInfo(buttonId)
@@ -402,8 +407,10 @@ function ButtonService.updateButton()
 				end
 			end
 		else
+			local cost = PurchasableService.getPurchaseCost(player, info.itemType, info.targetId) or info.config.BaseCost
 			local hasPalier = playerHasRequiredPalier(player, info.config)
-			button.Color = (hasPalier and MoneyService.canAfford(player, info.config.BaseCost)) and greenButton or redButton
+			setButtonText(button, formatCostText(info.config, cost))
+			button.Color = (hasPalier and MoneyService.canAfford(player, cost)) and greenButton or redButton
 		end
 	end
 end
@@ -603,7 +610,8 @@ function ButtonService.resetMachineButtonsForPlayer(player)
 		button:SetAttribute("Unlocked", false)
 		button:SetAttribute("IsUpgradeButton", false)
 		button:SetAttribute("Maxed", false)
-		setButtonText(button, getPurchaseButtonText(machineConfig))
+		local cost = PurchasableService.getPurchaseCost(player, "Machine", buttonId) or machineConfig.BaseCost
+		setButtonText(button, getPurchaseButtonText(machineConfig, cost))
 
 		if buttonId == 1 then
 			ButtonService.showButton(button)
