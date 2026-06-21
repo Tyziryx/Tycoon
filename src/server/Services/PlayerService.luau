@@ -10,6 +10,7 @@ local DefaultPlayerData = require(ReplicatedStorage.Shared.Config.PlayerData)
 local ZoneService = require(script.Parent.ZoneService)
 local RebirthService = require(script.Parent.RebirthService)
 local ShopService = require(script.Parent.ShopService)
+local MachineInventoryService = require(script.Parent.MachineInventoryService)
 
 local PlayerService = {}
 
@@ -56,6 +57,7 @@ function PlayerService.onPlayerAdded(player)
 
 	populateDataFolder(dataFolder, DefaultPlayerData)
 	ShopService.setupPlayer(player)
+	MachineInventoryService.setupPlayer(player)
 
 	local moneyValue = dataFolder:FindFirstChild("Money")
 	if moneyValue then
@@ -65,6 +67,7 @@ function PlayerService.onPlayerAdded(player)
 	MoneyService.setupLeaderstats(player)
 	PollutionService.setupLeaderstats(player)
 	RebirthService.setupLeaderstats(player)
+	MachineInventoryService.setupLeaderstats(player)
 	ZoneService.setupPlayer(player)
 end
 

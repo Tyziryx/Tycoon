@@ -274,6 +274,10 @@ une grille de plot, variantes aléatoires, raretés, doublons utiles, vente et r
 La progression principale doit rester déterministe ; l'aléatoire sert surtout à créer de
 la collection, du flex visuel et des optimisations.
 
+UX cible : le roll doit se présenter comme une **caisse animée** type CS:GO, puis la
+machine obtenue se place directement **à la souris** sur le plot avec preview, rotation et
+validation serveur. Pas de placement final par champs X/Z visibles au joueur.
+
 Voir la note dédiée : [`docs/RANDOMNESS_PLACEMENT.md`](RANDOMNESS_PLACEMENT.md).
 
 ## Notes techniques
@@ -308,8 +312,8 @@ Voir la note dédiée : [`docs/RANDOMNESS_PLACEMENT.md`](RANDOMNESS_PLACEMENT.md
 - [ ] **Rebirth / Cendres** : `RebirthService` (reset + calcul du gain géométrique).
 - [x] **Boutique de prestige** : socle code UI + `ShopService` + application des
       multiplicateurs. À tester en Studio et équilibrer.
-- [ ] **Aléatoire & placement libre** : inventorier les machines comme instances uniques,
-      ajouter placement grille, doublons, vente et recyclage (voir
-      `docs/RANDOMNESS_PLACEMENT.md`).
+- [x] **Aléatoire & placement libre** : socle d'instances uniques, placement grille,
+      doublons, vente, recyclage et fusion implémenté. Reste à produire l'UI finale,
+      les vrais visuels de variantes et la persistance (voir `docs/RANDOMNESS_PLACEMENT.md`).
 - [ ] **Courbe de prix** : recalibrer `MachineConfig` (×8–12 par palier) pour créer le mur.
 - [ ] Versionner le contenu 3D (modèles en `.rbxmx`/`.model.json`) pour le sortir de Studio.
