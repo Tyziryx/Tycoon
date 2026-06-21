@@ -230,7 +230,7 @@ local function setupLevelMarker(levelFolder, machine, firePart, level, color)
 	if not billboard then
 		billboard = Instance.new("BillboardGui")
 		billboard.Name = "LevelMarkerGui"
-		billboard.Size = UDim2.new(0, 150, 0, 48)
+		billboard.Size = UDim2.fromOffset(150, 48)
 		billboard.AlwaysOnTop = true
 		billboard.Parent = marker
 	end
@@ -241,7 +241,7 @@ local function setupLevelMarker(levelFolder, machine, firePart, level, color)
 		label = Instance.new("TextLabel")
 		label.Name = "Label"
 		label.BorderSizePixel = 0
-		label.Size = UDim2.new(1, 0, 1, 0)
+		label.Size = UDim2.fromScale(1, 1)
 		label.TextScaled = true
 		label.Font = Enum.Font.GothamBold
 		label.TextStrokeTransparency = 0

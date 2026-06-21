@@ -1,22 +1,22 @@
 local ZoneConfig = {
 	[1] = {
-		Name = "Zone de démarrage",
+		Name = "Friche sale",
 		PollutionThreshold = 0,
 	},
 	[2] = {
-		Name = "Zone industrielle",
+		Name = "Chantier industriel",
 		PollutionThreshold = 1000,
 	},
 	[3] = {
-		Name = "Zone charbon",
+		Name = "Charbon et vapeur",
 		PollutionThreshold = 10000,
 	},
 	[4] = {
-		Name = "Zone toxique",
+		Name = "Raffinerie toxique",
 		PollutionThreshold = 100000,
 	},
 	[5] = {
-		Name = "Zone apocalypse",
+		Name = "Apocalypse industrielle",
 		PollutionThreshold = 1000000,
 	},
 }
