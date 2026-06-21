@@ -291,8 +291,9 @@ Socle code ajouté :
   pity, vente, recyclage, fusion et grille.
 - `src/server/Services/MachineInventoryService.luau` : source de vérité des instances,
   rolls, placement, vente, recyclage, fusion et remotes.
-- `src/client/UI/MachineInventory.client.luau` : UI de test pour roll/sélectionner,
-  choisir X/Z/rotation, placer, ranger, vendre, recycler, fusionner et verrouiller.
+- `src/client/UI/MachineInventory.client.luau` : UI de test avec tirage animé type caisse,
+  sélection d'instance, placement au curseur avec ghost preview, rangement, vente,
+  recyclage, fusion et verrouillage.
 - `Machine.luau` et `PurchasableService.luau` : les achats existants créent maintenant
   des instances placées, et le revenu lit les instances placées.
 
@@ -310,7 +311,8 @@ Remotes serveur :
 
 Limites connues du MVP :
 
-- le placement se fait par UI X/Z/rotation, pas encore par preview souris dans le monde ;
+- le placement au curseur utilise un ghost preview grille ; l'UX finale devra remplacer
+  le panneau de test par une interface plus intégrée au jeu ;
 - la persistance DataStore n'est pas encore branchée ;
 - les variantes utilisent surtout les placeholders et des attributs/tints, les vrais
   visuels Studio restent à produire ;

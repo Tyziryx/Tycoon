@@ -1,5 +1,11 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+
+local RandomMachineConfig = require(ReplicatedStorage.Shared.Config.RandomMachineConfig)
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -18,7 +24,7 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "MachineInventoryGui"
 screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true
-screenGui.DisplayOrder = 65
+screenGui.DisplayOrder = 70
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.Parent = playerGui
 
@@ -40,7 +46,7 @@ local panel = Instance.new("Frame")
 panel.Name = "MachinePanel"
 panel.AnchorPoint = Vector2.new(1, 1)
 panel.Position = UDim2.new(1, -18, 1, -116)
-panel.Size = UDim2.fromOffset(430, 520)
+panel.Size = UDim2.fromOffset(430, 500)
 panel.BackgroundColor3 = Color3.fromRGB(17, 22, 21)
 panel.BackgroundTransparency = 0.04
 panel.BorderSizePixel = 0
@@ -124,38 +130,28 @@ end
 local rollButton = makeButton("Roll", "", UDim2.fromOffset(300, 38), UDim2.fromOffset(112, 34), panel)
 
 local controls = Instance.new("Frame")
-controls.Name = "PlacementControls"
+controls.Name = "SelectedControls"
 controls.Position = UDim2.fromOffset(12, 88)
-controls.Size = UDim2.new(1, -24, 0, 118)
+controls.Size = UDim2.new(1, -24, 0, 96)
 controls.BackgroundColor3 = Color3.fromRGB(28, 34, 32)
 controls.BorderSizePixel = 0
 controls.ZIndex = 22
 controls.Parent = panel
 
-local selectedLabel = makeLabel("Selected", UDim2.fromOffset(12, 8), UDim2.new(1, -24, 0, 22), controls)
-local gridLabel = makeLabel("Grid", UDim2.fromOffset(12, 30), UDim2.new(1, -24, 0, 18), controls)
+local selectedLabel = makeLabel("Selected", UDim2.fromOffset(12, 8), UDim2.new(1, -92, 0, 38), controls)
+local gridLabel = makeLabel("Grid", UDim2.fromOffset(12, 46), UDim2.new(1, -24, 0, 18), controls)
 
-local xMinus = makeButton("XMinus", "X-", UDim2.fromOffset(12, 56), UDim2.fromOffset(42, 24), controls)
-local xValue = makeLabel("XValue", UDim2.fromOffset(58, 58), UDim2.fromOffset(48, 20), controls)
-local xPlus = makeButton("XPlus", "X+", UDim2.fromOffset(108, 56), UDim2.fromOffset(42, 24), controls)
-
-local zMinus = makeButton("ZMinus", "Z-", UDim2.fromOffset(164, 56), UDim2.fromOffset(42, 24), controls)
-local zValue = makeLabel("ZValue", UDim2.fromOffset(210, 58), UDim2.fromOffset(48, 20), controls)
-local zPlus = makeButton("ZPlus", "Z+", UDim2.fromOffset(260, 56), UDim2.fromOffset(42, 24), controls)
-local rotateButton = makeButton("Rotate", "90", UDim2.fromOffset(316, 56), UDim2.fromOffset(78, 24), controls)
-
-local placeButton = makeButton("Place", "PLACER", UDim2.fromOffset(12, 86), UDim2.fromOffset(72, 24), controls)
-local unplaceButton = makeButton("Unplace", "RANGER", UDim2.fromOffset(90, 86), UDim2.fromOffset(72, 24), controls)
-local sellButton = makeButton("Sell", "VENDRE", UDim2.fromOffset(168, 86), UDim2.fromOffset(70, 24), controls)
-local recycleButton = makeButton("Recycle", "RECYCLE", UDim2.fromOffset(244, 86), UDim2.fromOffset(70, 24), controls)
-local fuseButton = makeButton("Fuse", "FUSION", UDim2.fromOffset(320, 86), UDim2.fromOffset(74, 24), controls)
-
-local lockButton = makeButton("Lock", "LOCK", UDim2.fromOffset(328, 8), UDim2.fromOffset(66, 24), controls)
+local placeButton = makeButton("Place", "PLACER", UDim2.fromOffset(12, 66), UDim2.fromOffset(70, 24), controls)
+local unplaceButton = makeButton("Unplace", "RANGER", UDim2.fromOffset(88, 66), UDim2.fromOffset(70, 24), controls)
+local sellButton = makeButton("Sell", "VENDRE", UDim2.fromOffset(164, 66), UDim2.fromOffset(68, 24), controls)
+local recycleButton = makeButton("Recycle", "RECYCLE", UDim2.fromOffset(238, 66), UDim2.fromOffset(70, 24), controls)
+local fuseButton = makeButton("Fuse", "FUSION", UDim2.fromOffset(314, 66), UDim2.fromOffset(74, 24), controls)
+local lockButton = makeButton("Lock", "LOCK", UDim2.new(1, -78, 0, 10), UDim2.fromOffset(66, 24), controls)
 
 local list = Instance.new("ScrollingFrame")
 list.Name = "MachineList"
-list.Position = UDim2.fromOffset(12, 216)
-list.Size = UDim2.new(1, -24, 1, -228)
+list.Position = UDim2.fromOffset(12, 194)
+list.Size = UDim2.new(1, -24, 1, -206)
 list.BackgroundTransparency = 1
 list.BorderSizePixel = 0
 list.CanvasSize = UDim2.fromOffset(0, 0)
@@ -172,12 +168,104 @@ layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 	list.CanvasSize = UDim2.fromOffset(0, layout.AbsoluteContentSize.Y + 8)
 end)
 
+local rollOverlay = Instance.new("Frame")
+rollOverlay.Name = "RollOverlay"
+rollOverlay.AnchorPoint = Vector2.new(0.5, 0.5)
+rollOverlay.Position = UDim2.fromScale(0.5, 0.45)
+rollOverlay.Size = UDim2.fromOffset(680, 210)
+rollOverlay.BackgroundColor3 = Color3.fromRGB(13, 16, 15)
+rollOverlay.BackgroundTransparency = 0.04
+rollOverlay.BorderSizePixel = 0
+rollOverlay.Visible = false
+rollOverlay.ZIndex = 80
+rollOverlay.Parent = screenGui
+
+local rollerTitle = Instance.new("TextLabel")
+rollerTitle.Name = "RollTitle"
+rollerTitle.Position = UDim2.fromOffset(20, 12)
+rollerTitle.Size = UDim2.new(1, -40, 0, 26)
+rollerTitle.BackgroundTransparency = 1
+rollerTitle.Font = Enum.Font.GothamBlack
+rollerTitle.Text = "CONTENEUR MACHINE"
+rollerTitle.TextColor3 = Color3.fromRGB(235, 255, 245)
+rollerTitle.TextSize = 18
+rollerTitle.ZIndex = 81
+rollerTitle.Parent = rollOverlay
+
+local rollerWindow = Instance.new("Frame")
+rollerWindow.Name = "RollWindow"
+rollerWindow.Position = UDim2.fromOffset(20, 54)
+rollerWindow.Size = UDim2.new(1, -40, 0, 118)
+rollerWindow.BackgroundColor3 = Color3.fromRGB(22, 28, 26)
+rollerWindow.BorderSizePixel = 0
+rollerWindow.ClipsDescendants = true
+rollerWindow.ZIndex = 81
+rollerWindow.Parent = rollOverlay
+
+local rollerStrip = Instance.new("Frame")
+rollerStrip.Name = "RollStrip"
+rollerStrip.Position = UDim2.fromOffset(0, 0)
+rollerStrip.Size = UDim2.fromOffset(4000, 118)
+rollerStrip.BackgroundTransparency = 1
+rollerStrip.ZIndex = 82
+rollerStrip.Parent = rollerWindow
+
+local centerMarker = Instance.new("Frame")
+centerMarker.Name = "CenterMarker"
+centerMarker.AnchorPoint = Vector2.new(0.5, 0)
+centerMarker.Position = UDim2.fromScale(0.5, 0)
+centerMarker.Size = UDim2.fromOffset(4, 118)
+centerMarker.BackgroundColor3 = Color3.fromRGB(255, 235, 120)
+centerMarker.BorderSizePixel = 0
+centerMarker.ZIndex = 86
+centerMarker.Parent = rollerWindow
+
+local rollResultLabel = Instance.new("TextLabel")
+rollResultLabel.Name = "RollResult"
+rollResultLabel.Position = UDim2.fromOffset(20, 178)
+rollResultLabel.Size = UDim2.new(1, -40, 0, 22)
+rollResultLabel.BackgroundTransparency = 1
+rollResultLabel.Font = Enum.Font.GothamBold
+rollResultLabel.Text = ""
+rollResultLabel.TextColor3 = Color3.fromRGB(235, 255, 245)
+rollResultLabel.TextSize = 14
+rollResultLabel.ZIndex = 81
+rollResultLabel.Parent = rollOverlay
+
+local placementHud = Instance.new("Frame")
+placementHud.Name = "PlacementHud"
+placementHud.AnchorPoint = Vector2.new(0.5, 0)
+placementHud.Position = UDim2.new(0.5, 0, 0, 20)
+placementHud.Size = UDim2.fromOffset(520, 58)
+placementHud.BackgroundColor3 = Color3.fromRGB(14, 18, 17)
+placementHud.BackgroundTransparency = 0.08
+placementHud.BorderSizePixel = 0
+placementHud.Visible = false
+placementHud.ZIndex = 70
+placementHud.Parent = screenGui
+
+local placementLabel = Instance.new("TextLabel")
+placementLabel.Name = "PlacementLabel"
+placementLabel.Position = UDim2.fromOffset(14, 8)
+placementLabel.Size = UDim2.new(1, -28, 0, 42)
+placementLabel.BackgroundTransparency = 1
+placementLabel.Font = Enum.Font.GothamBold
+placementLabel.Text = ""
+placementLabel.TextColor3 = Color3.fromRGB(235, 255, 245)
+placementLabel.TextSize = 14
+placementLabel.TextWrapped = true
+placementLabel.ZIndex = 71
+placementLabel.Parent = placementHud
+
 local state = nil
 local selectedInstanceId = nil
-local selectedX = 0
-local selectedZ = 0
-local selectedRotation = 0
 local busy = false
+local placementMode = false
+local placementRotation = 0
+local placementPreview = nil
+local placementConnection = nil
+local inputConnection = nil
+local currentPlacement = nil
 
 local function formatNumber(amount)
 	if amount >= 1000000000000 then
@@ -206,14 +294,33 @@ local function findSelectedInstance()
 	return nil
 end
 
-local function clampPlacement()
+local function findInstance(instanceId)
 	if not state then
-		return
+		return nil
 	end
 
-	selectedX = math.clamp(selectedX, 0, math.max(0, state.Placement.MaxColumns - 1))
-	selectedZ = math.clamp(selectedZ, 0, math.max(0, state.Placement.MaxRows - 1))
-	selectedRotation = selectedRotation % 360
+	for _, machine in ipairs(state.Instances) do
+		if machine.InstanceId == instanceId then
+			return machine
+		end
+	end
+
+	return nil
+end
+
+local function getPlayerTycoon()
+	local tycoons = Workspace:FindFirstChild("Tycoons")
+	if not tycoons then
+		return nil
+	end
+
+	for _, tycoon in tycoons:GetChildren() do
+		if tycoon:GetAttribute("UserId") == player.UserId then
+			return tycoon
+		end
+	end
+
+	return nil
 end
 
 local function clearRows()
@@ -227,22 +334,15 @@ end
 local function selectMachine(machine)
 	selectedInstanceId = machine and machine.InstanceId or nil
 	if machine then
-		selectedX = math.max(0, machine.PlotX)
-		selectedZ = math.max(0, machine.PlotZ)
-		selectedRotation = machine.Rotation
-	else
-		selectedX = 0
-		selectedZ = 0
-		selectedRotation = 0
+		placementRotation = machine.Rotation or 0
 	end
-	clampPlacement()
 end
 
 local renderState
 
 local function callRemote(remote, ...)
 	if busy then
-		return
+		return nil
 	end
 
 	busy = true
@@ -255,13 +355,351 @@ local function callRemote(remote, ...)
 		end
 	end
 	busy = false
+	return result
+end
+
+local function getPlacementConfig()
+	local placement = state and state.Placement
+	return placement or RandomMachineConfig.Placement
+end
+
+local function getMachineRelativeCFrame(machine, plotX, plotZ, rotation)
+	local placement = getPlacementConfig()
+	local footprintX = machine.FootprintX or 1
+	local footprintZ = machine.FootprintZ or 1
+	local x = placement.OriginX + ((plotX + ((footprintX - 1) * 0.5)) * placement.CellSize)
+	local z = placement.OriginZ - ((plotZ + ((footprintZ - 1) * 0.5)) * placement.CellSize)
+	return CFrame.new(x, 0, z) * CFrame.Angles(0, math.rad(rotation), 0)
+end
+
+local function clampGrid(machine, plotX, plotZ)
+	local placement = getPlacementConfig()
+	local maxX = math.max(0, placement.MaxColumns - (machine.FootprintX or 1))
+	local maxZ = math.max(0, placement.MaxRows - (machine.FootprintZ or 1))
+	return math.clamp(plotX, 0, maxX), math.clamp(plotZ, 0, maxZ)
+end
+
+local function regionsOverlap(aX, aZ, aWidth, aDepth, bX, bZ, bWidth, bDepth)
+	return aX < bX + bWidth and bX < aX + aWidth and aZ < bZ + bDepth and bZ < aZ + aDepth
+end
+
+local function isClientOccupied(machine, plotX, plotZ)
+	if not state then
+		return false
+	end
+
+	for _, other in ipairs(state.Instances) do
+		if other.Placed and other.InstanceId ~= machine.InstanceId then
+			if regionsOverlap(
+				plotX,
+				plotZ,
+				machine.FootprintX or 1,
+				machine.FootprintZ or 1,
+				other.PlotX,
+				other.PlotZ,
+				other.FootprintX or 1,
+				other.FootprintZ or 1
+			) then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+local function getMouseGrid(machine, tycoon)
+	local camera = Workspace.CurrentCamera
+	local primaryPart = tycoon and tycoon.PrimaryPart
+	if not camera or not primaryPart then
+		return nil
+	end
+
+	local mouseLocation = UserInputService:GetMouseLocation()
+	local ray = camera:ViewportPointToRay(mouseLocation.X, mouseLocation.Y)
+	if math.abs(ray.Direction.Y) < 0.001 then
+		return nil
+	end
+
+	local distance = (primaryPart.Position.Y - ray.Origin.Y) / ray.Direction.Y
+	if distance < 0 then
+		return nil
+	end
+
+	local worldPoint = ray.Origin + (ray.Direction * distance)
+	local localPoint = primaryPart.CFrame:PointToObjectSpace(worldPoint)
+	local placement = getPlacementConfig()
+	local plotX = math.floor((localPoint.X - placement.OriginX + (placement.CellSize * 0.5)) / placement.CellSize)
+	local plotZ = math.floor((placement.OriginZ - localPoint.Z + (placement.CellSize * 0.5)) / placement.CellSize)
+	return clampGrid(machine, plotX, plotZ)
+end
+
+local function destroyPlacementPreview()
+	if placementPreview then
+		placementPreview:Destroy()
+		placementPreview = nil
+	end
+end
+
+local function createPlacementPreview(machine)
+	destroyPlacementPreview()
+
+	local placement = getPlacementConfig()
+	local model = Instance.new("Model")
+	model.Name = "PlacementPreview"
+
+	local plate = Instance.new("Part")
+	plate.Name = "Footprint"
+	plate.Size = Vector3.new(
+		((machine.FootprintX or 1) * placement.CellSize) - 0.35,
+		0.35,
+		((machine.FootprintZ or 1) * placement.CellSize) - 0.35
+	)
+	plate.Anchored = true
+	plate.CanCollide = false
+	plate.CanTouch = false
+	plate.CanQuery = false
+	plate.Material = Enum.Material.Neon
+	plate.Transparency = 0.45
+	plate.Parent = model
+	model.PrimaryPart = plate
+
+	local labelGui = Instance.new("BillboardGui")
+	labelGui.Name = "PreviewLabel"
+	labelGui.Size = UDim2.fromOffset(220, 48)
+	labelGui.StudsOffset = Vector3.new(0, 2.6, 0)
+	labelGui.AlwaysOnTop = true
+	labelGui.Parent = plate
+
+	local label = Instance.new("TextLabel")
+	label.Name = "Label"
+	label.Size = UDim2.fromScale(1, 1)
+	label.BackgroundColor3 = Color3.fromRGB(12, 14, 13)
+	label.BackgroundTransparency = 0.18
+	label.BorderSizePixel = 0
+	label.Font = Enum.Font.GothamBold
+	label.Text = machine.MachineName
+	label.TextColor3 = Color3.fromRGB(235, 255, 245)
+	label.TextScaled = true
+	label.TextWrapped = true
+	label.Parent = labelGui
+
+	model.Parent = Workspace
+	placementPreview = model
+end
+
+local function setPreviewValidity(isValid)
+	if not placementPreview or not placementPreview.PrimaryPart then
+		return
+	end
+
+	placementPreview.PrimaryPart.Color = isValid and Color3.fromRGB(80, 240, 120) or Color3.fromRGB(240, 75, 75)
+end
+
+local function updatePlacementPreview()
+	local machine = findSelectedInstance()
+	local tycoon = getPlayerTycoon()
+	if not placementMode or not machine or not tycoon or not placementPreview then
+		currentPlacement = nil
+		return
+	end
+
+	local plotX, plotZ = getMouseGrid(machine, tycoon)
+	if not plotX or not plotZ then
+		setPreviewValidity(false)
+		currentPlacement = nil
+		return
+	end
+
+	local isOccupied = isClientOccupied(machine, plotX, plotZ)
+	local relativeCF = getMachineRelativeCFrame(machine, plotX, plotZ, placementRotation)
+	local worldCF = tycoon.PrimaryPart.CFrame:ToWorldSpace(relativeCF) * CFrame.new(0, 0.25, 0)
+	placementPreview:PivotTo(worldCF)
+	setPreviewValidity(not isOccupied)
+	currentPlacement = {
+		PlotX = plotX,
+		PlotZ = plotZ,
+		Rotation = placementRotation,
+		IsValid = not isOccupied,
+	}
+	placementLabel.Text = machine.MachineName
+		.. " | clic gauche: placer | clic droit/R: rotation "
+		.. placementRotation
+		.. "° | Esc: annuler"
+end
+
+local function endPlacementMode()
+	placementMode = false
+	placementHud.Visible = false
+	currentPlacement = nil
+	destroyPlacementPreview()
+
+	if placementConnection then
+		placementConnection:Disconnect()
+		placementConnection = nil
+	end
+	if inputConnection then
+		inputConnection:Disconnect()
+		inputConnection = nil
+	end
+end
+
+local function submitCurrentPlacement()
+	if not currentPlacement or not currentPlacement.IsValid or not selectedInstanceId or busy then
+		return
+	end
+
+	busy = true
+	local result = placeRemote:InvokeServer(
+		selectedInstanceId,
+		currentPlacement.PlotX,
+		currentPlacement.PlotZ,
+		currentPlacement.Rotation
+	)
+	if result then
+		messageLabel.Text = result.Message or ""
+		if result.State then
+			renderState(result.State)
+		end
+		if result.Success then
+			endPlacementMode()
+			panel.Visible = true
+		end
+	end
+	busy = false
+end
+
+local function beginPlacementMode(machine)
+	if not machine then
+		return
+	end
+
+	local tycoon = getPlayerTycoon()
+	if not tycoon or not tycoon.PrimaryPart then
+		messageLabel.Text = "Claim un terrain avant de placer."
+		return
+	end
+
+	endPlacementMode()
+	selectMachine(machine)
+	placementMode = true
+	panel.Visible = false
+	placementHud.Visible = true
+	placementRotation = machine.Rotation or 0
+	createPlacementPreview(machine)
+	updatePlacementPreview()
+
+	placementConnection = RunService.RenderStepped:Connect(updatePlacementPreview)
+	inputConnection = UserInputService.InputBegan:Connect(function(input, processed)
+		if processed then
+			return
+		end
+
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			submitCurrentPlacement()
+		elseif input.UserInputType == Enum.UserInputType.MouseButton2 or input.KeyCode == Enum.KeyCode.R then
+			placementRotation = (placementRotation + 90) % 360
+			updatePlacementPreview()
+		elseif input.KeyCode == Enum.KeyCode.Escape then
+			endPlacementMode()
+			panel.Visible = true
+		end
+	end)
+end
+
+local function createRollCard(parent, index, machine)
+	local cardWidth = 126
+	local gap = 8
+	local card = Instance.new("Frame")
+	card.Name = "RollCard_" .. index
+	card.Position = UDim2.fromOffset((index - 1) * (cardWidth + gap), 8)
+	card.Size = UDim2.fromOffset(cardWidth, 102)
+	card.BackgroundColor3 = machine.RarityColor:Lerp(Color3.fromRGB(12, 14, 13), 0.35)
+	card.BorderSizePixel = 0
+	card.ZIndex = 83
+	card.Parent = parent
+
+	local rarity = Instance.new("TextLabel")
+	rarity.Name = "Rarity"
+	rarity.Position = UDim2.fromOffset(8, 8)
+	rarity.Size = UDim2.new(1, -16, 0, 18)
+	rarity.BackgroundTransparency = 1
+	rarity.Font = Enum.Font.GothamBlack
+	rarity.Text = machine.RarityName
+	rarity.TextColor3 = Color3.fromRGB(255, 255, 255)
+	rarity.TextSize = 12
+	rarity.ZIndex = 84
+	rarity.Parent = card
+
+	local name = Instance.new("TextLabel")
+	name.Name = "Name"
+	name.Position = UDim2.fromOffset(8, 30)
+	name.Size = UDim2.new(1, -16, 0, 56)
+	name.BackgroundTransparency = 1
+	name.Font = Enum.Font.GothamBold
+	name.Text = machine.VariantName .. "\n" .. machine.MachineName
+	name.TextColor3 = Color3.fromRGB(235, 255, 245)
+	name.TextSize = 12
+	name.TextWrapped = true
+	name.ZIndex = 84
+	name.Parent = card
+end
+
+local function makeFakeRollMachine(index)
+	local rarityId = RandomMachineConfig.RarityOrder[((index - 1) % #RandomMachineConfig.RarityOrder) + 1]
+	local variantId = RandomMachineConfig.VariantOrder[((index * 3) % #RandomMachineConfig.VariantOrder) + 1]
+	local rarity = RandomMachineConfig.Rarities[rarityId]
+	local variant = RandomMachineConfig.Variants[variantId]
+	return {
+		RarityName = rarity.Name,
+		VariantName = variant.Name,
+		MachineName = "Machine",
+		RarityColor = rarity.Color,
+	}
+end
+
+local function playRollAnimation(rolledMachine)
+	if not rolledMachine then
+		return
+	end
+
+	for _, child in rollerStrip:GetChildren() do
+		child:Destroy()
+	end
+
+	local cardWidth = 126
+	local gap = 8
+	local targetIndex = 26
+	local totalCards = 34
+	for index = 1, totalCards do
+		createRollCard(rollerStrip, index, index == targetIndex and rolledMachine or makeFakeRollMachine(index))
+	end
+
+	rollerStrip.Position = UDim2.fromOffset(0, 0)
+	rollResultLabel.Text = ""
+	rollOverlay.Visible = true
+
+	local targetCenter = ((targetIndex - 1) * (cardWidth + gap)) + (cardWidth * 0.5)
+	local windowCenter = rollerWindow.AbsoluteSize.X * 0.5
+	local finalOffset = windowCenter - targetCenter
+	local tween = TweenService:Create(
+		rollerStrip,
+		TweenInfo.new(3.1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+		{ Position = UDim2.fromOffset(finalOffset, 0) }
+	)
+	tween:Play()
+	tween.Completed:Wait()
+
+	rollResultLabel.Text = rolledMachine.RarityName .. " " .. rolledMachine.VariantName .. " - " .. rolledMachine.MachineName
+	task.wait(0.8)
+	rollOverlay.Visible = false
 end
 
 local function createMachineRow(machine, index)
 	local row = Instance.new("Frame")
 	row.Name = machine.InstanceId
 	row.LayoutOrder = index
-	row.Size = UDim2.new(1, -8, 0, 94)
+	row.Size = UDim2.new(1, -8, 0, 96)
 	row.BackgroundColor3 = machine.RarityColor:Lerp(Color3.fromRGB(20, 24, 23), 0.55)
 	row.BorderSizePixel = 0
 	row.ZIndex = 22
@@ -270,7 +708,7 @@ local function createMachineRow(machine, index)
 	local selectedMarker = Instance.new("Frame")
 	selectedMarker.Name = "SelectedMarker"
 	selectedMarker.Position = UDim2.fromOffset(0, 0)
-	selectedMarker.Size = UDim2.fromOffset(4, 94)
+	selectedMarker.Size = UDim2.fromOffset(4, 96)
 	selectedMarker.BackgroundColor3 = machine.InstanceId == selectedInstanceId and Color3.fromRGB(255, 236, 120)
 		or Color3.fromRGB(62, 72, 68)
 	selectedMarker.BorderSizePixel = 0
@@ -295,11 +733,10 @@ local function createMachineRow(machine, index)
 	local detail = Instance.new("TextLabel")
 	detail.Name = "Detail"
 	detail.Position = UDim2.fromOffset(12, 44)
-	detail.Size = UDim2.new(1, -96, 0, 40)
+	detail.Size = UDim2.new(1, -96, 0, 42)
 	detail.BackgroundTransparency = 1
 	detail.Font = Enum.Font.Gotham
-	local placedText = machine.Placed and ("X" .. machine.PlotX .. " Z" .. machine.PlotZ .. " R" .. machine.Rotation)
-		or "Inventaire"
+	local placedText = machine.Placed and ("Placee X" .. machine.PlotX .. " Z" .. machine.PlotZ) or "Inventaire"
 	detail.Text = placedText
 		.. " | Lv."
 		.. machine.Level
@@ -319,18 +756,23 @@ local function createMachineRow(machine, index)
 	detail.ZIndex = 23
 	detail.Parent = row
 
-	local selectButton = makeButton("Select", "SELECT", UDim2.new(1, -82, 0, 12), UDim2.fromOffset(70, 30), row)
+	local selectButton = makeButton("Select", "SELECT", UDim2.new(1, -82, 0, 10), UDim2.fromOffset(70, 28), row)
 	selectButton.MouseButton1Click:Connect(function()
 		selectMachine(machine)
 		renderState(state)
+	end)
+
+	local placeRowButton = makeButton("PlaceNow", "PLACER", UDim2.new(1, -82, 0, 44), UDim2.fromOffset(70, 28), row)
+	placeRowButton.MouseButton1Click:Connect(function()
+		beginPlacementMode(machine)
 	end)
 
 	local lockText = machine.Locked and "LOCK" or ""
 	local lockLabel = Instance.new("TextLabel")
 	lockLabel.Name = "LockState"
 	lockLabel.AnchorPoint = Vector2.new(1, 1)
-	lockLabel.Position = UDim2.new(1, -12, 1, -10)
-	lockLabel.Size = UDim2.fromOffset(70, 20)
+	lockLabel.Position = UDim2.new(1, -12, 1, -6)
+	lockLabel.Size = UDim2.fromOffset(70, 18)
 	lockLabel.BackgroundTransparency = 1
 	lockLabel.Font = Enum.Font.GothamBold
 	lockLabel.Text = lockText
@@ -355,14 +797,10 @@ function renderState(nextState)
 		selectMachine(state.Instances[1])
 	end
 
-	clampPlacement()
 	local selected = findSelectedInstance()
 	resourceLabel.Text = state.ScrapName .. ": " .. formatNumber(state.Scrap)
 	rollButton.Text = "ROLL $" .. formatNumber(state.RollCost)
-	gridLabel.Text = "Grille " .. state.Placement.MaxColumns .. "x" .. state.Placement.MaxRows .. " | Palier " .. state.CurrentZone
-	xValue.Text = "X " .. selectedX
-	zValue.Text = "Z " .. selectedZ
-	rotateButton.Text = tostring(selectedRotation) .. "°"
+	gridLabel.Text = "Terrain " .. state.Placement.MaxColumns .. "x" .. state.Placement.MaxRows .. " | Palier " .. state.CurrentZone
 
 	if selected then
 		selectedLabel.Text = selected.RarityName .. " " .. selected.VariantName .. " - " .. selected.MachineName
@@ -384,41 +822,34 @@ local function refresh()
 end
 
 rollButton.MouseButton1Click:Connect(function()
-	callRemote(rollRemote)
-end)
+	if busy then
+		return
+	end
 
-xMinus.MouseButton1Click:Connect(function()
-	selectedX -= 1
-	clampPlacement()
-	renderState(state)
-end)
+	busy = true
+	messageLabel.Text = ""
+	local result = rollRemote:InvokeServer()
+	if result then
+		if result.State then
+			renderState(result.State)
+		end
+		messageLabel.Text = result.Message or ""
 
-xPlus.MouseButton1Click:Connect(function()
-	selectedX += 1
-	clampPlacement()
-	renderState(state)
-end)
-
-zMinus.MouseButton1Click:Connect(function()
-	selectedZ -= 1
-	clampPlacement()
-	renderState(state)
-end)
-
-zPlus.MouseButton1Click:Connect(function()
-	selectedZ += 1
-	clampPlacement()
-	renderState(state)
-end)
-
-rotateButton.MouseButton1Click:Connect(function()
-	selectedRotation = (selectedRotation + 90) % 360
-	renderState(state)
+		if result.Success and result.InstanceId then
+			local rolledMachine = findInstance(result.InstanceId)
+			selectMachine(rolledMachine)
+			playRollAnimation(rolledMachine)
+			renderState(state)
+			beginPlacementMode(rolledMachine)
+		end
+	end
+	busy = false
 end)
 
 placeButton.MouseButton1Click:Connect(function()
-	if selectedInstanceId then
-		callRemote(placeRemote, selectedInstanceId, selectedX, selectedZ, selectedRotation)
+	local selected = findSelectedInstance()
+	if selected then
+		beginPlacementMode(selected)
 	end
 end)
 
@@ -453,6 +884,10 @@ lockButton.MouseButton1Click:Connect(function()
 end)
 
 toggleButton.MouseButton1Click:Connect(function()
+	if placementMode then
+		endPlacementMode()
+	end
+
 	panel.Visible = not panel.Visible
 	if panel.Visible then
 		refresh()
@@ -460,7 +895,7 @@ toggleButton.MouseButton1Click:Connect(function()
 end)
 
 updatedRemote.OnClientEvent:Connect(function(nextState)
-	if panel.Visible then
+	if panel.Visible or placementMode then
 		renderState(nextState)
 	end
 end)

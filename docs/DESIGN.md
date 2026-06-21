@@ -274,6 +274,10 @@ une grille de plot, variantes aléatoires, raretés, doublons utiles, vente et r
 La progression principale doit rester déterministe ; l'aléatoire sert surtout à créer de
 la collection, du flex visuel et des optimisations.
 
+UX cible : le roll doit se présenter comme une **caisse animée** type CS:GO, puis la
+machine obtenue se place directement **à la souris** sur le plot avec preview, rotation et
+validation serveur. Pas de placement final par champs X/Z visibles au joueur.
+
 Voir la note dédiée : [`docs/RANDOMNESS_PLACEMENT.md`](RANDOMNESS_PLACEMENT.md).
 
 ## Notes techniques

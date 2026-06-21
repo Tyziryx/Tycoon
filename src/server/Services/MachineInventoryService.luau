@@ -974,6 +974,9 @@ function MachineInventoryService.getInventoryState(player)
 		Placement = {
 			MaxColumns = maxColumns,
 			MaxRows = maxRows,
+			CellSize = RandomMachineConfig.Placement.CellSize,
+			OriginX = RandomMachineConfig.Placement.OriginX,
+			OriginZ = RandomMachineConfig.Placement.OriginZ,
 		},
 	}
 end
