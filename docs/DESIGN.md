@@ -267,6 +267,15 @@ niveaux à coût **géométrique** (ex. ×1.5 par niveau).
 > dans la conversion Mafia (`TycoonService`), dans `ManualBurnerService` (clic) et dans le
 > calcul des coûts (`Purchasable`/`Machine`). Stockés par joueur, persistés via DataStore.
 
+## Aléatoire, collection et placement libre
+
+Le jeu peut évoluer vers un tycoon plus personnalisable : machines placées librement sur
+une grille de plot, variantes aléatoires, raretés, doublons utiles, vente et recyclage.
+La progression principale doit rester déterministe ; l'aléatoire sert surtout à créer de
+la collection, du flex visuel et des optimisations.
+
+Voir la note dédiée : [`docs/RANDOMNESS_PLACEMENT.md`](RANDOMNESS_PLACEMENT.md).
+
 ## Notes techniques
 
 ### Ajouter une nouvelle machine
@@ -299,5 +308,8 @@ niveaux à coût **géométrique** (ex. ×1.5 par niveau).
 - [ ] **Rebirth / Cendres** : `RebirthService` (reset + calcul du gain géométrique).
 - [x] **Boutique de prestige** : socle code UI + `ShopService` + application des
       multiplicateurs. À tester en Studio et équilibrer.
+- [ ] **Aléatoire & placement libre** : inventorier les machines comme instances uniques,
+      ajouter placement grille, doublons, vente et recyclage (voir
+      `docs/RANDOMNESS_PLACEMENT.md`).
 - [ ] **Courbe de prix** : recalibrer `MachineConfig` (×8–12 par palier) pour créer le mur.
 - [ ] Versionner le contenu 3D (modèles en `.rbxmx`/`.model.json`) pour le sortir de Studio.
